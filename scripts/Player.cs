@@ -36,15 +36,10 @@ public partial class Player : CharacterBody3D
 
     public override void _EnterTree()
     {
-
-        // HACK: Using name as the peer id because I cannot find a way to get the m_PeerId set properly
-        this.SetMultiplayerAuthority(this.Name.ToString().ToInt()); // Set the multiplayer authority
     }
 
     public override void _Ready()
     {
-        if (!IsMultiplayerAuthority()) { return; }
-
         // For more accurate mouse input
         Input.UseAccumulatedInput = false;
 
@@ -60,8 +55,6 @@ public partial class Player : CharacterBody3D
 
     public override void _UnhandledInput(InputEvent @event)
     {
-        if (!IsMultiplayerAuthority()) { return; }
-
         // Checking mouse button events
         if (@event is InputEventMouseButton mouseButtonEvent && Input.MouseMode == Input.MouseModeEnum.Captured)
         {
@@ -99,8 +92,6 @@ public partial class Player : CharacterBody3D
 
     public override void _PhysicsProcess(double delta)
     {
-        if (!IsMultiplayerAuthority()) { return; }
-
         Vector3 velocity = this.Velocity;
 
         // Add the gravity
