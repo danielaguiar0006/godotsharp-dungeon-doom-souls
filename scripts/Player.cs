@@ -24,7 +24,7 @@ public partial class Player : CharacterBody3D
     private float m_PitchLowerLimit = 0.0f;
     private float m_PitchUpperLimit = 0.0f;
 
-    // For Garbage Collection Optimization - Godot uses custom strings for actions which causes potential GC problems
+    // Static Strings For Garbage Collection Optimization - Godot uses custom strings for actions which causes potential GC problems
     private static StringName s_MoveForward = new StringName("move_forward");
     private static StringName s_MoveBackward = new StringName("move_backward");
     private static StringName s_MoveLeft = new StringName("move_left");
@@ -50,6 +50,7 @@ public partial class Player : CharacterBody3D
         m_PitchLowerLimit = Mathf.DegToRad(-90);
         m_PitchUpperLimit = Mathf.DegToRad(90);
 
+        // Make sure the view-port camera is set to the current camera
         m_Camera.Current = true;
     }
 
@@ -92,6 +93,7 @@ public partial class Player : CharacterBody3D
 
     public override void _PhysicsProcess(double delta)
     {
+        // Instead of constantly making calls to this.Velocity, cache it for better performance and work with the new variable instead
         Vector3 velocity = this.Velocity;
 
         // Add the gravity
@@ -117,6 +119,7 @@ public partial class Player : CharacterBody3D
             velocity.Z = Mathf.MoveToward(Velocity.Z, 0, m_Speed);
         }
 
+        // Move the player
         this.Velocity = velocity;
         MoveAndSlide();
     }
