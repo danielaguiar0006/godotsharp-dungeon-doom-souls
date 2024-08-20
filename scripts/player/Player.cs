@@ -66,6 +66,9 @@ public partial class Player : CharacterBody3D
 
     public override void _Process(double delta)
     {
+        // DEBUG: Information about the current state on the screen
+        this.GetNode<Label>("CurrentStateDebugInfo").Text = m_CurrentState.GetType().Name;
+
         // NOTE: newState is null if the state does not change, otherwise it is the new state
         PlayerState newState = m_CurrentState.Process(this, delta);
         if (newState != null)

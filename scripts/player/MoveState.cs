@@ -1,7 +1,7 @@
 using Godot;
 using static InputActions;
 
-public class IdleState : PlayerState
+public class MoveState : PlayerState
 {
     public override void OnEnterState(Player player)
     {
@@ -10,8 +10,6 @@ public class IdleState : PlayerState
 
     public override PlayerState HandleInput(Player player, InputEvent @event)
     {
-        // TODO: Most of not all of the camera movement code will be duplicated in most states. Figure out a way to refactor this.
-
         // Checking mouse button events
         if (@event is InputEventMouseButton mouseButtonEvent && Input.MouseMode == Input.MouseModeEnum.Captured)
         {
@@ -57,11 +55,7 @@ public class IdleState : PlayerState
 
     public override PlayerState Process(Player player, double delta)
     {
-        if (Input.IsActionPressed(s_MoveForward) || Input.IsActionPressed(s_MoveBackward) || Input.IsActionPressed(s_MoveLeft) || Input.IsActionPressed(s_MoveRight))
-        {
-            return new MoveState();
-        }
-        else if (Input.IsActionPressed(s_MoveDodge))
+        if (Input.IsActionPressed(s_MoveDodge))
         {
             return new DodgeState();
         }
@@ -71,6 +65,45 @@ public class IdleState : PlayerState
 
     public override PlayerState PhysicsProcess(Player player, double delta)
     {
+        // Instead of constantly making calls to this.Velocity, cache it for better performance and work with the new variable instead
+        Vector3 velocity = player.Velocity;
+
+        // TODO: Seperate jumping/falling into it's own state
+        // Add the gravity
+        if (!player.IsOnFloor())
+            velocity.Y -= player.m_Gravity * (float)delta;
+
+        // Handle Jump
+        if (Input.IsActionJustPressed(s_MoveJump) && player.IsOnFloor())
+            velocity.Y = player.m_JumpVelocity;
+
+        // Get the input direction and handle the movement/deceleration.
+        Vector2 inputDir = Input.GetVector(s_MoveLeft, s_MoveRight, s_MoveForward, s_MoveBackward);
+        Vector3 direction = (player.Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
+        if (direction != Vector3.Zero)
+        {
+            velocity.X = direction.X * player.m_Speed;
+            velocity.Z = direction.Z * player.m_Speed;
+        }
+        else
+        {
+            velocity.X = Mathf.MoveToward(player.Velocity.X, 0, player.m_Speed);
+            velocity.Z = Mathf.MoveToward(player.Velocity.Z, 0, player.m_Speed);
+        }
+
+        // Move the player
+        player.Velocity = velocity;
+        player.MoveAndSlide();
+
+        // TODO: Implement walking and running states
+
+        // Transition to the idle state if the player is not moving
+        if (player.Velocity.Length() == 0)
+        {
+            return new IdleState();
+        }
+
         return null;
     }
 }
+
