@@ -9,5 +9,5 @@ struct InputActions
     public static StringName s_MoveRight = new StringName("move_right");
     public static StringName s_MoveJump = new StringName("move_jump");
     public static StringName s_MoveDodge = new StringName("move_dodge");
-    public static StringName s_AttackOne = new StringName("attack_one");
+    public static StringName s_AttackLight = new StringName("attack_light");
 }

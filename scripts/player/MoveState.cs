@@ -14,36 +14,11 @@ public class MoveState : PlayerState
         if (@event is InputEventMouseButton mouseButtonEvent && Input.MouseMode == Input.MouseModeEnum.Captured)
         {
             // Transition to the attack state if the attack button is pressed
-            if (mouseButtonEvent.IsActionPressed(s_AttackOne))
+            if (mouseButtonEvent.IsActionPressed(s_AttackLight))
             {
                 return new AttackState();
             }
         }
-
-        // Checking if the mouse is active
-        if (@event is InputEventMouseMotion mouseInputEvent && Input.MouseMode == Input.MouseModeEnum.Captured)
-        {
-            player.m_YawInput = -mouseInputEvent.Relative.X;
-            player.m_PitchInput = -mouseInputEvent.Relative.Y;
-        }
-        else
-        { // Reset the mouse input if the mouse is not active
-          // InputEventMouseMotion.Relative is not reset to 0 when the mouse is not active
-            player.m_YawInput = 0.0f;
-            player.m_PitchInput = 0.0f;
-        }
-
-        // Rotate player
-        player.RotateY(Mathf.DegToRad(player.m_YawInput * player.m_MouseSensitivity));
-        // Rotate camera pivot and clamp the pitch
-        player.m_CameraPivot.RotateX(Mathf.DegToRad(player.m_PitchInput * player.m_MouseSensitivity));
-
-        // HACK: This does not work for some reason:
-        // m_CameraPivot.Rotation.X = Mathf.Clamp(m_CameraPivot.Rotation.X, m_PitchLowerLimit, m_PitchUpperLimit);
-
-        Vector3 cameraRotation = player.m_CameraPivot.Rotation;
-        cameraRotation.X = Mathf.Clamp(cameraRotation.X, player.m_PitchLowerLimit, player.m_PitchUpperLimit);
-        player.m_CameraPivot.Rotation = cameraRotation;
 
         return null;
     }
@@ -79,16 +54,16 @@ public class MoveState : PlayerState
 
         // Get the input direction and handle the movement/deceleration.
         Vector2 inputDir = Input.GetVector(s_MoveLeft, s_MoveRight, s_MoveForward, s_MoveBackward);
-        Vector3 direction = (player.Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
-        if (direction != Vector3.Zero)
+        player.m_MovementDirection = (player.Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
+        if (player.m_MovementDirection != Vector3.Zero)
         {
-            velocity.X = direction.X * player.m_Speed;
-            velocity.Z = direction.Z * player.m_Speed;
+            velocity.X = player.m_MovementDirection.X * player.m_MovementSpeed;
+            velocity.Z = player.m_MovementDirection.Z * player.m_MovementSpeed;
         }
         else
         {
-            velocity.X = Mathf.MoveToward(player.Velocity.X, 0, player.m_Speed);
-            velocity.Z = Mathf.MoveToward(player.Velocity.Z, 0, player.m_Speed);
+            velocity.X = Mathf.MoveToward(player.Velocity.X, 0, player.m_MovementSpeed);
+            velocity.Z = Mathf.MoveToward(player.Velocity.Z, 0, player.m_MovementSpeed);
         }
 
         // Move the player
