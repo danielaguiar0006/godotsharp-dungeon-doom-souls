@@ -10,7 +10,7 @@ public partial class Camera : Camera3D
     [Export]
     protected float lerpSpeed = 75.0f; // Adjust this value to your liking
     [Export]
-    protected Node3D m_TargetCameraTransform;
+    public Node3D m_TargetCameraTransform;
     private Transform3D m_TargetCameraPosition;
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.

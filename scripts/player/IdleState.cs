@@ -3,9 +3,9 @@ using static InputActions;
 
 public class IdleState : PlayerState
 {
-    public override void OnEnterState(Player player)
+    public override PlayerState OnEnterState(Player player)
     {
-
+        return null;
     }
 
     public override PlayerState HandleInput(Player player, InputEvent @event)
@@ -33,6 +33,10 @@ public class IdleState : PlayerState
         if (Input.IsActionPressed(s_MoveForward) || Input.IsActionPressed(s_MoveBackward) || Input.IsActionPressed(s_MoveLeft) || Input.IsActionPressed(s_MoveRight))
         {
             return new MoveState();
+        }
+        else if (Input.IsActionPressed(s_MoveJump))
+        {
+            // TODO: return new JumpState();
         }
         else if (Input.IsActionPressed(s_MoveDodge))
         {

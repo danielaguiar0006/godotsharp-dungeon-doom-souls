@@ -1,7 +1,7 @@
 using Godot;
 using ActionTypes;
 
-// Note: The reason for all the public variables is so that player data can be easily
+// NOTE: The reason for all the public variables is so that player data can be easily
 // read and modified in the invividual states (i.e. IdleState, ShootingState, etc...).
 public partial class Player : CharacterBody3D
 {
@@ -59,6 +59,7 @@ public partial class Player : CharacterBody3D
 
         // Set the players initial state here
         m_CurrentState = new IdleState();
+        m_CurrentState.OnEnterState(this);
     }
 
     public override void _UnhandledInput(InputEvent @event)
@@ -78,6 +79,8 @@ public partial class Player : CharacterBody3D
     {
         // DEBUG: Information about the current state on the screen
         this.GetNode<Label>("CurrentStateDebugInfo").Text = m_CurrentState.GetType().Name;
+        // DEBUG: Show if the player is on the floor currently
+        this.GetNode<Label>("IsOnFloorDebugInfo").Text = this.IsOnFloor().ToString();
 
         // NOTE: newState is null if the state does not change, otherwise it is the new state
         PlayerState newState = m_CurrentState.Process(this, delta);
@@ -95,10 +98,11 @@ public partial class Player : CharacterBody3D
         if (newState != null)
         {
             m_CurrentState = newState;
+            m_CurrentState.OnEnterState(this);
         }
     }
 
-    // Helper funciton to aim the camera/ get mouse input
+    // Helper funciton to aim the camera through mouse/controller input
     private void AimCamera(InputEvent @event)
     {
         // Checking if the mouse is active
@@ -125,6 +129,5 @@ public partial class Player : CharacterBody3D
         Vector3 cameraRotation = m_CameraPivot.Rotation;
         cameraRotation.X = Mathf.Clamp(cameraRotation.X, m_PitchLowerLimit, m_PitchUpperLimit);
         m_CameraPivot.Rotation = cameraRotation;
-
     }
 }

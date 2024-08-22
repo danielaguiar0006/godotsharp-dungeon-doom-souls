@@ -5,30 +5,48 @@ using ActionTypes;
 
 public class DodgeState : PlayerState
 {
-    private float dodgeTimeSec; // How long the dodge will last
+    // How long the dodge will last, animations and all
+    private float dodgeTimeSec;
 
     // Dodge speeds
-    private float rollSpeedFactor = 0.5f;
+    private float rollSpeedFactor = 1.25f;
     private float dashSpeedFactor = 5.0f;
 
+    // The target camera transform, used to determine the direction the player is looking
+    Transform3D targetCameraTransform;
 
-    public override void OnEnterState(Player player)
+
+    public override PlayerState OnEnterState(Player player)
     {
-
-        if (player.m_DodgeType == DodgeType.Roll)
+        switch (player.m_DodgeType)
         {
-            dodgeTimeSec = 0.4f;
-            rollSpeedFactor *= player.m_DodgeSpeedFactor;
+            case DodgeType.Roll:
+                // Note: This is done here and not in the physics process because physics
+                // process is called once every physics tick, not asap, which causes a delay bug
+                if (!player.IsOnFloor())
+                {
+                    GD.Print("Rolling in the air is not allowed");
+                    return new MoveState();
+                }
 
-            // Play the roll animation
-        }
-        else if (player.m_DodgeType == DodgeType.Dash)
-        {
-            dodgeTimeSec = 0.2f;
-            dashSpeedFactor *= player.m_DodgeSpeedFactor;
+                GD.Print("Rolling!!!");
+                dodgeTimeSec = 0.5f;
+                rollSpeedFactor *= player.m_DodgeSpeedFactor;
 
-            // Play the dash animation
+                // Play the roll animation
+                break;
+            case DodgeType.Dash:
+                GD.Print("Dashing!!!");
+                dodgeTimeSec = 0.2f;
+                dashSpeedFactor *= player.m_DodgeSpeedFactor;
+
+                // Play the dash animation
+                break;
         }
+
+        targetCameraTransform = player.GetNode<Node3D>("CameraPivot/TargetCamera").GlobalTransform;
+
+        return null;
     }
 
     public override PlayerState HandleInput(Player player, InputEvent @event)
@@ -50,30 +68,35 @@ public class DodgeState : PlayerState
 
     public override PlayerState PhysicsProcess(Player player, double delta)
     {
-        // TODO: when the player is moveing in any direction, the dodge should be whever the player is looking/aiming
-
         // Dodge the player - Affected by player's dodge type, speed factor, regular movement speed, dodge time, and movement direction
         if (dodgeTimeSec > 0)
         {
             Vector3 velocity = player.Velocity;
 
-            if (player.m_DodgeType == DodgeType.Roll)
+            Vector3 wishDirection;
+            if (player.m_MovementDirection != Vector3.Zero) // if player is moving, dodge in the direction the player is moving
             {
-                if (player.IsOnFloor())
-                {
-                    // Apply rolling motion on the XZ plane
-                    velocity.X = player.m_MovementDirection.X * player.m_MovementSpeed * rollSpeedFactor;
-                    velocity.Z = player.m_MovementDirection.Z * player.m_MovementSpeed * rollSpeedFactor;
-                    velocity.Y = 0; // Ensure no vertical movement
-                }
+                wishDirection = player.m_MovementDirection; // NOTE: m_MovementDirection is already normalized
             }
-            else if (player.m_DodgeType == DodgeType.Dash)
+            else  // else dodge in the direction the player is looking
             {
-                // Apply dash motion on the XZY plane
-                velocity.X = player.m_MovementDirection.X * player.m_MovementSpeed * dashSpeedFactor;
-                velocity.Z = player.m_MovementDirection.Z * player.m_MovementSpeed * dashSpeedFactor;
-                velocity.Y = 0; // Ensure no vertical movement
-                // TODO: // To where the player is looking/aiming
+                wishDirection = -targetCameraTransform.Basis.Z.Normalized(); // Forward direction of the camera
+            }
+
+            switch (player.m_DodgeType)
+            {
+                case DodgeType.Roll:
+                    velocity.X = wishDirection.X * player.m_MovementSpeed * rollSpeedFactor;
+                    velocity.Z = wishDirection.Z * player.m_MovementSpeed * rollSpeedFactor;
+                    // If the player rolls off a ledge, they will continue to fall
+                    if (!player.IsOnFloor())
+                        velocity.Y -= player.m_Gravity * (float)delta;
+                    break;
+                case DodgeType.Dash:
+                    velocity.X = wishDirection.X * player.m_MovementSpeed * dashSpeedFactor;
+                    velocity.Z = wishDirection.Z * player.m_MovementSpeed * dashSpeedFactor;
+                    velocity.Y = 0; // Ensure no vertical movement - IDK: Maybe another dodge type that allows vertical movement
+                    break;
             }
 
             // Move the player

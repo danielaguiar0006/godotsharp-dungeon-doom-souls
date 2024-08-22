@@ -3,9 +3,15 @@ using static InputActions;
 
 public class MoveState : PlayerState
 {
-    public override void OnEnterState(Player player)
+    public override PlayerState OnEnterState(Player player)
     {
+        // HACK: Perform an immediate physics update to avoid delay in state transition
+        // This help alleviate an issue of the player moving at half speed when constantly
+        // and immediatly transitioning between states in PhysicsProcess (This might cause
+        // other issues, but it's a tradeoff for now)
+        player._PhysicsProcess(Engine.GetPhysicsInterpolationFraction());
 
+        return null;
     }
 
     public override PlayerState HandleInput(Player player, InputEvent @event)
@@ -30,10 +36,6 @@ public class MoveState : PlayerState
 
     public override PlayerState Process(Player player, double delta)
     {
-        if (Input.IsActionPressed(s_MoveDodge))
-        {
-            return new DodgeState();
-        }
 
         return null;
     }
@@ -44,6 +46,7 @@ public class MoveState : PlayerState
         Vector3 velocity = player.Velocity;
 
         // TODO: Seperate jumping/falling into it's own state
+
         // Add the gravity
         if (!player.IsOnFloor())
             velocity.Y -= player.m_Gravity * (float)delta;
@@ -76,6 +79,13 @@ public class MoveState : PlayerState
         if (player.Velocity.Length() == 0)
         {
             return new IdleState();
+        }
+
+        // NOTE: needs this transition to the dodge state needs to be after player.MoveAndSlide()
+        // To avoid the player's movemnet being frozen while holding the dodge button
+        if (Input.IsActionJustPressed(s_MoveDodge))
+        {
+            return new DodgeState();
         }
 
         return null;

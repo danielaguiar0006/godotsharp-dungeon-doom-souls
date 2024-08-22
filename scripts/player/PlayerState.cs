@@ -3,9 +3,10 @@ using Godot;
 public class PlayerState
 {
     // Called when the state is entered
-    public virtual void OnEnterState(Player player)
+    public virtual PlayerState OnEnterState(Player player)
     {
         // Change the player's animation state here for example
+        return null;
     }
 
     // For gameplay input - That isn't already handled by Godot through the InputMap system.
@@ -16,8 +17,8 @@ public class PlayerState
         return null;
     }
 
-    // Note: To handle keyboard events, use this funciton instead for performance reasons.
     // returns the new state if the state changes, otherwise returns null
+    // NOTE: To handle keyboard events, use this funciton instead for performance reasons.
     public virtual PlayerState HandleKeyboardInput(Player player, InputEvent @event)
     {
         return null;
@@ -40,4 +41,6 @@ public class PlayerState
     {
         return null;
     }
+
+    // TODO: OnExitState() {}
 }
