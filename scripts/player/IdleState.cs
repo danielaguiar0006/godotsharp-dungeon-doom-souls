@@ -36,7 +36,7 @@ public class IdleState : PlayerState
         }
         else if (Input.IsActionJustPressed(s_MoveJump))
         {
-            // TODO: return new JumpState();
+            return new JumpState();
         }
         else if (Input.IsActionJustPressed(s_MoveDodge))
         {

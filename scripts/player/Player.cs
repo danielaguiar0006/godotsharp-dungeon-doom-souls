@@ -3,7 +3,7 @@ using static InputActions;
 using ActionTypes;
 
 // NOTE: The reason for all the public variables is so that player data can be easily
-// read and modified in the invividual states (i.e. IdleState, ShootingState, etc...).
+// read and modified in the individual states (i.e. IdleState, ShootingState, etc...).
 public partial class Player : CharacterBody3D
 {
     [ExportCategory("Movement")]
@@ -148,7 +148,7 @@ public partial class Player : CharacterBody3D
     }
 
     // Helper function to apply gravity to a vector in different states
-    // This does not apply the gravity directly to the player's velocity, but to a target vector
+    // This does not apply gravity directly to the player's velocity, but instead to a target vector
     public void ApplyGravityToVector(ref Vector3 velocity, double delta)
     {
         // Add the gravity
@@ -156,6 +156,7 @@ public partial class Player : CharacterBody3D
             velocity.Y -= this.m_Gravity * (float)delta;
     }
 
+    // This does not apply input movement directly to the player's velocity, but instead to a target vector
     public void ApplyMovementInputToVector(ref Vector3 velocity, float movementSpeedFactor = 1.0f)
     {
         // Get the input direction and handle the movement/deceleration.
@@ -173,6 +174,7 @@ public partial class Player : CharacterBody3D
         }
     }
 
+    // This does not apply movement direction directly to the player's velocity, but instead to a target vector
     public void ApplyMovementDirectionToVector(ref Vector3 velocity, Vector3 wishDirection, float movementSpeedFactor = 1.0f)
     {
         if (wishDirection != Vector3.Zero)

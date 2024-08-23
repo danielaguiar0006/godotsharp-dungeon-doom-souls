@@ -18,7 +18,7 @@ public class PlayerState
     }
 
     // returns the new state if the state changes, otherwise returns null
-    // NOTE: To handle keyboard events, use this funciton instead for performance reasons.
+    // NOTE: To handle keyboard events, use this function instead for performance reasons.
     public virtual PlayerState HandleKeyboardInput(Player player, InputEvent @event)
     {
         return null;
