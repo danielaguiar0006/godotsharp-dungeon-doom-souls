@@ -34,11 +34,11 @@ public class IdleState : PlayerState
         {
             return new MoveState();
         }
-        else if (Input.IsActionPressed(s_MoveJump))
+        else if (Input.IsActionJustPressed(s_MoveJump))
         {
             // TODO: return new JumpState();
         }
-        else if (Input.IsActionPressed(s_MoveDodge))
+        else if (Input.IsActionJustPressed(s_MoveDodge))
         {
             return new DodgeState();
         }
@@ -46,8 +46,13 @@ public class IdleState : PlayerState
         return null;
     }
 
-    public override PlayerState PhysicsProcess(Player player, double delta)
+    public override PlayerState PhysicsProcess(Player player, ref Vector3 velocity, double delta)
     {
+        if (!player.IsOnFloor() && velocity.Y < 0.0f)
+        {
+            return new FallState();
+        }
+
         return null;
     }
 }

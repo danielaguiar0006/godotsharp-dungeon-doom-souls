@@ -37,7 +37,7 @@ public class PlayerState
     // Physics processing means that the frame rate is synced to the physics,
     // i.e. the `delta` variable should be constant (`delta` is in seconds).
     // returns the new state if the state changes, otherwise returns null
-    public virtual PlayerState PhysicsProcess(Player player, double delta)
+    public virtual PlayerState PhysicsProcess(Player player, ref Vector3 velocity, double delta)
     {
         return null;
     }

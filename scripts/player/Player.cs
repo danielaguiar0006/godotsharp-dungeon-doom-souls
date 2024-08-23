@@ -1,4 +1,5 @@
 using Godot;
+using static InputActions;
 using ActionTypes;
 
 // NOTE: The reason for all the public variables is so that player data can be easily
@@ -82,7 +83,6 @@ public partial class Player : CharacterBody3D
         // DEBUG: Show if the player is on the floor currently
         this.GetNode<Label>("IsOnFloorDebugInfo").Text = this.IsOnFloor().ToString();
 
-        // NOTE: newState is null if the state does not change, otherwise it is the new state
         PlayerState newState = m_CurrentState.Process(this, delta);
         if (newState != null)
         {
@@ -93,13 +93,20 @@ public partial class Player : CharacterBody3D
 
     public override void _PhysicsProcess(double delta)
     {
-        // NOTE: newState is null if the state does not change, otherwise it is the new state
-        PlayerState newState = m_CurrentState.PhysicsProcess(this, delta);
+        // NOTE: Instead of constantly making calls to this.Velocity cache it for better 
+        // performance and work with the new velocity variable instead
+        Vector3 velocity = this.Velocity;
+
+        PlayerState newState = m_CurrentState.PhysicsProcess(this, ref velocity, delta);
         if (newState != null)
         {
             m_CurrentState = newState;
             m_CurrentState.OnEnterState(this);
         }
+
+        // Apply gravity and movement
+        ApplyGravityToVector(ref velocity, delta);
+        ApplyPlayerMovement(ref velocity);
     }
 
     // Helper funciton to aim the camera through mouse/controller input
@@ -130,4 +137,54 @@ public partial class Player : CharacterBody3D
         cameraRotation.X = Mathf.Clamp(cameraRotation.X, m_PitchLowerLimit, m_PitchUpperLimit);
         m_CameraPivot.Rotation = cameraRotation;
     }
+
+
+    // moveSpeedFactor can be used for slower or faster movement (walking, running, etc...)
+    public void ApplyPlayerMovement(ref Vector3 velocity)
+    {
+        // Move the player
+        this.Velocity = velocity;
+        this.MoveAndSlide();
+    }
+
+    // Helper function to apply gravity to a vector in different states
+    // This does not apply the gravity directly to the player's velocity, but to a target vector
+    public void ApplyGravityToVector(ref Vector3 velocity, double delta)
+    {
+        // Add the gravity
+        if (!this.IsOnFloor())
+            velocity.Y -= this.m_Gravity * (float)delta;
+    }
+
+    public void ApplyMovementInputToVector(ref Vector3 velocity, float movementSpeedFactor = 1.0f)
+    {
+        // Get the input direction and handle the movement/deceleration.
+        Vector2 inputDir = Input.GetVector(s_MoveLeft, s_MoveRight, s_MoveForward, s_MoveBackward);
+        this.m_MovementDirection = (this.Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
+        if (this.m_MovementDirection != Vector3.Zero)
+        {
+            velocity.X = this.m_MovementDirection.X * this.m_MovementSpeed * movementSpeedFactor;
+            velocity.Z = this.m_MovementDirection.Z * this.m_MovementSpeed * movementSpeedFactor;
+        }
+        else  // If the player is not moving, decelerate
+        {
+            velocity.X = Mathf.MoveToward(velocity.X, 0, this.m_MovementSpeed * movementSpeedFactor);
+            velocity.Z = Mathf.MoveToward(velocity.Z, 0, this.m_MovementSpeed * movementSpeedFactor);
+        }
+    }
+
+    public void ApplyMovementDirectionToVector(ref Vector3 velocity, Vector3 wishDirection, float movementSpeedFactor = 1.0f)
+    {
+        if (wishDirection != Vector3.Zero)
+        {
+            velocity.X = wishDirection.X * this.m_MovementSpeed * movementSpeedFactor;
+            velocity.Z = wishDirection.Z * this.m_MovementSpeed * movementSpeedFactor;
+        }
+        else
+        {
+            velocity.X = Mathf.MoveToward(this.Velocity.X, 0, this.m_MovementSpeed * movementSpeedFactor);
+            velocity.Z = Mathf.MoveToward(this.Velocity.Z, 0, this.m_MovementSpeed * movementSpeedFactor);
+        }
+    }
+
 }

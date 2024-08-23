@@ -1,19 +1,10 @@
 using Godot;
 using static InputActions;
 
-public class MoveState : PlayerState
+public class FallState : PlayerState
 {
     public override PlayerState OnEnterState(Player player)
     {
-        // HACK: Perform an immediate physics update to avoid delay in state transition
-        // This help alleviate an issue of the player moving at half speed when constantly
-        // and immediatly transitioning between states in PhysicsProcess (This might cause
-        // other issues, but it's a tradeoff for now)
-        // NOTE: This has been resolved by forcing player movement every physics tick inside 
-        // _PhysicsProcess() in the main Player script
-        //
-        //player._PhysicsProcess(Engine.GetPhysicsInterpolationFraction());
-
         return null;
     }
 
@@ -45,8 +36,8 @@ public class MoveState : PlayerState
 
     public override PlayerState PhysicsProcess(Player player, ref Vector3 velocity, double delta)
     {
-        float regularSpeedFactor = 1.0f;
-        player.ApplyMovementInputToVector(ref velocity, regularSpeedFactor);
+        float fallingSpeedMovementFactor = 1.0f;
+        player.ApplyMovementInputToVector(ref velocity, fallingSpeedMovementFactor);
 
         // Transition to the idle state if the player is not moving
         if (velocity.Length() == 0)
@@ -54,21 +45,17 @@ public class MoveState : PlayerState
             return new IdleState();
         }
 
-        // Transition to the move state if the player fallling
-        if (!player.IsOnFloor() && velocity.Y < 0.0f)
+        // Transition to the move state if the player is on the floor and moving
+        if (player.IsOnFloor() && (velocity.X != 0 || velocity.Z != 0))
         {
-            return new FallState();
+            return new MoveState();
         }
-
-        if (Input.IsActionJustPressed(s_MoveJump) && player.IsOnFloor())
-            velocity.Y = player.m_JumpVelocity;
 
         if (Input.IsActionJustPressed(s_MoveDodge))
         {
             return new DodgeState();
         }
 
-        // TODO: Implement walking and running states
         return null;
     }
 }
