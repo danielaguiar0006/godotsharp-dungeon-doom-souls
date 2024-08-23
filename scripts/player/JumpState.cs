@@ -1,18 +1,19 @@
 using Godot;
 using static InputActions;
 
-public class MoveState : PlayerState
+public class JumpState : PlayerState
 {
+    float appliedJumpVelocityTimeSec;  // Time in seconds that the jump velocity will be applied to the player
+    float jumpVelocity;                // The velocity that will be applied to the player when jumping
+    bool isJumping;                    // If the player is currently jumping - Is the player in this state?
+
+
     public override PlayerState OnEnterState(Player player)
     {
-        // HACK: Perform an immediate physics update to avoid delay in state transition
-        // This help alleviate an issue of the player moving at half speed when constantly
-        // and immediatly transitioning between states in PhysicsProcess (This might cause
-        // other issues, but it's a tradeoff for now)
-        // NOTE: This has been resolved by forcing player movement every physics tick inside 
-        // _PhysicsProcess() in the main Player script
-        //
-        //player._PhysicsProcess(Engine.GetPhysicsInterpolationFraction());
+        GD.Print("Jumping!!!");
+        appliedJumpVelocityTimeSec = 0.1f;
+        jumpVelocity = player.m_JumpVelocity;
+        isJumping = true;
 
         return null;
     }
@@ -39,14 +40,30 @@ public class MoveState : PlayerState
 
     public override PlayerState Process(Player player, double delta)
     {
+        appliedJumpVelocityTimeSec -= (float)delta;
 
         return null;
     }
 
     public override PlayerState PhysicsProcess(Player player, ref Vector3 velocity, double delta)
     {
-        float regularSpeedFactor = 1.0f;
-        player.ApplyMovementInputToVector(ref velocity, regularSpeedFactor);
+        if (isJumping)
+        {
+            float jumpSpeedMovementFactor = 1.0f;
+            player.ApplyMovementInputToVector(ref velocity, jumpSpeedMovementFactor);
+
+            if (appliedJumpVelocityTimeSec > 0.0f)
+            {
+                // Apply the jump velocity to the player's Y velocity
+                velocity.Y = jumpVelocity;
+            }
+        }
+        else
+        {
+            GD.Print("ERROR: Stuck in the JumpState!, transitioning to FallState.");
+            return new FallState();
+        }
+
 
         // Transition to the idle state if the player is not moving
         if (velocity.Length() == 0)
@@ -60,17 +77,11 @@ public class MoveState : PlayerState
             return new FallState();
         }
 
-        if (Input.IsActionJustPressed(s_MoveJump) && player.IsOnFloor())
-        {
-            return new JumpState();
-        }
-
         if (Input.IsActionJustPressed(s_MoveDodge))
         {
             return new DodgeState();
         }
 
-        // TODO: Implement walking and running states
         return null;
     }
 }

@@ -10,7 +10,7 @@ public partial class Player : CharacterBody3D
     [Export]
     public float m_MovementSpeed = 5.0f;
     [Export]
-    public float m_JumpVelocity = 4.5f;
+    public float m_JumpVelocity = 4.0f;
 
     [ExportCategory("Camera")]
     [Export]
