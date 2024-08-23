@@ -3,7 +3,7 @@ using static InputActions;
 using ActionTypes;
 
 // NOTE: The reason for all the public variables is so that player data can be easily
-// read and modified in the individual states (i.e. IdleState, ShootingState, etc...).
+// read and modified in the individual states (i.e. IdleState, MoveState, etc...).
 public partial class Player : CharacterBody3D
 {
     [ExportCategory("Movement")]

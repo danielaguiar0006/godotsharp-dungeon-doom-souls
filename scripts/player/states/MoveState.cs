@@ -7,8 +7,8 @@ public class MoveState : PlayerState
     {
         // HACK: Perform an immediate physics update to avoid delay in state transition
         // This help alleviate an issue of the player moving at half speed when constantly
-        // and immediatly transitioning between states in PhysicsProcess (This might cause
-        // other issues, but it's a tradeoff for now)
+        // and immediately transitioning between states in _PhysicsProcess() (This might cause
+        // other issues, but it's a trade off for now)
         // NOTE: This has been resolved by forcing player movement every physics tick inside 
         // _PhysicsProcess() in the main Player script
         //
