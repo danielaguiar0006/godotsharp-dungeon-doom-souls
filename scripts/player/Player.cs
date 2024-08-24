@@ -71,6 +71,19 @@ public partial class Player : CharacterBody3D
         PlayerState newState = m_CurrentState.HandleInput(this, @event);
         if (newState != null)
         {
+            m_CurrentState.OnExitState(this);
+            m_CurrentState = newState;
+            m_CurrentState.OnEnterState(this);
+        }
+    }
+
+    public override void _UnhandledKeyInput(InputEvent @event)
+    {
+        // NOTE: newState is null if the state does not change, otherwise it is the new state
+        PlayerState newState = m_CurrentState.HandleKeyboardInput(this, @event);
+        if (newState != null)
+        {
+            m_CurrentState.OnExitState(this);
             m_CurrentState = newState;
             m_CurrentState.OnEnterState(this);
         }
@@ -79,13 +92,14 @@ public partial class Player : CharacterBody3D
     public override void _Process(double delta)
     {
         // DEBUG: Information about the current state on the screen
-        this.GetNode<Label>("CurrentStateDebugInfo").Text = m_CurrentState.GetType().Name;
+        this.GetNode<Label>("CurrentStateDebugInfo").Text = "Current State: " + m_CurrentState.GetType().Name;
         // DEBUG: Show if the player is on the floor currently
-        this.GetNode<Label>("IsOnFloorDebugInfo").Text = this.IsOnFloor().ToString();
+        this.GetNode<Label>("IsOnFloorDebugInfo").Text = "On Floor: " + this.IsOnFloor().ToString();
 
         PlayerState newState = m_CurrentState.Process(this, delta);
         if (newState != null)
         {
+            m_CurrentState.OnExitState(this);
             m_CurrentState = newState;
             m_CurrentState.OnEnterState(this);
         }
@@ -100,6 +114,7 @@ public partial class Player : CharacterBody3D
         PlayerState newState = m_CurrentState.PhysicsProcess(this, ref velocity, delta);
         if (newState != null)
         {
+            m_CurrentState.OnExitState(this);
             m_CurrentState = newState;
             m_CurrentState.OnEnterState(this);
         }

@@ -42,5 +42,9 @@ public class PlayerState
         return null;
     }
 
-    // TODO: OnExitState() {}
+    // Called when the state is exited - Clean up any state-specific resources here
+    public virtual void OnExitState(Player player)
+    {
+        // Clean up any state-specific resources here
+    }
 }

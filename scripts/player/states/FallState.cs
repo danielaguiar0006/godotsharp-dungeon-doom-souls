@@ -16,7 +16,7 @@ public class FallState : PlayerState
             // Transition to the attack state if the attack button is pressed
             if (mouseButtonEvent.IsActionPressed(s_AttackLight))
             {
-                return new AttackState();
+                return new AttackLightState();
             }
         }
 
@@ -57,6 +57,10 @@ public class FallState : PlayerState
         }
 
         return null;
+    }
+
+    public override void OnExitState(Player player)
+    {
     }
 }
 

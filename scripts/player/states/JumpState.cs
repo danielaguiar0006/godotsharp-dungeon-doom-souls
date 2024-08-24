@@ -26,7 +26,7 @@ public class JumpState : PlayerState
             // Transition to the attack state if the attack button is pressed
             if (mouseButtonEvent.IsActionPressed(s_AttackLight))
             {
-                return new AttackState();
+                return new AttackLightState();
             }
         }
 
@@ -64,7 +64,6 @@ public class JumpState : PlayerState
             return new FallState();
         }
 
-
         // Transition to the idle state if the player is not moving
         if (velocity.Length() == 0)
         {
@@ -83,6 +82,10 @@ public class JumpState : PlayerState
         }
 
         return null;
+    }
+
+    public override void OnExitState(Player player)
+    {
     }
 }
 

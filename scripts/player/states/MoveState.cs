@@ -25,7 +25,7 @@ public class MoveState : PlayerState
             // Transition to the attack state if the attack button is pressed
             if (mouseButtonEvent.IsActionPressed(s_AttackLight))
             {
-                return new AttackState();
+                return new AttackLightState();
             }
         }
 
@@ -72,6 +72,10 @@ public class MoveState : PlayerState
 
         // TODO: Implement walking and running states
         return null;
+    }
+
+    public override void OnExitState(Player player)
+    {
     }
 }
 

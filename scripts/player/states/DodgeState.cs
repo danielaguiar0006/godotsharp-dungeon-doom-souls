@@ -99,4 +99,8 @@ public class DodgeState : PlayerState
 
         return null;
     }
+
+    public override void OnExitState(Player player)
+    {
+    }
 }

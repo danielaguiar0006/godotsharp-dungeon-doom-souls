@@ -2,8 +2,11 @@ using Godot;
 using static InputActions;
 
 // TODO: Finish implementing first version of
-public class AttackState : PlayerState
+public class AttackLightState : PlayerState
 {
+    // How long the attack will last, animations and all
+    //private float attackLightTimeSec;
+
     public override PlayerState OnEnterState(Player player)
     {
         return null;
@@ -22,5 +25,9 @@ public class AttackState : PlayerState
     public override PlayerState PhysicsProcess(Player player, ref Vector3 velocity, double delta)
     {
         return null;
+    }
+
+    public override void OnExitState(Player player)
+    {
     }
 }
