@@ -4,11 +4,18 @@ using static InputActions;
 // TODO: Finish implementing first version of
 public class AttackLightState : PlayerState
 {
+    // TODO: Read from the players equipped weapon to determine the attack time, damage, 
+    // animation, etc... and have a seperate state for each specific weapon.  
+
     // How long the attack will last, animations and all
     //private float attackLightTimeSec;
 
     public override PlayerState OnEnterState(Player player)
     {
+        // do things
+        // do more things
+        //
+        // call the weapons OnAttackLightStateEnter() or somethings
         return null;
     }
 
