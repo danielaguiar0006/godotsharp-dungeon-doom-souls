@@ -6,11 +6,12 @@ using ActionTypes;
 public class DodgeState : PlayerState
 {
     // How long the dodge will last, animations and all
-    private float dodgeTimeSec;
+    private float currentDodgeTimeSec;
+    private float totalDodgeTimeSec;
 
     // Dodge speeds
     private float rollSpeedFactor = 1.75f;
-    private float dashSpeedFactor = 5.0f;
+    private float dashSpeedFactor = 12.0f;
 
     // The target camera transform, used to determine the direction the player is looking
     Transform3D targetCameraTransform;
@@ -30,14 +31,16 @@ public class DodgeState : PlayerState
                 }
 
                 GD.Print("Rolling!!!");
-                dodgeTimeSec = 0.5f;
+                currentDodgeTimeSec = 0.5f;
+                totalDodgeTimeSec = currentDodgeTimeSec;
                 rollSpeedFactor *= player.m_DodgeSpeedFactor;
 
                 // Play the roll animation
                 break;
             case DodgeType.Dash:
                 GD.Print("Dashing!!!");
-                dodgeTimeSec = 0.2f;
+                currentDodgeTimeSec = 0.25f;
+                totalDodgeTimeSec = currentDodgeTimeSec;
                 dashSpeedFactor *= player.m_DodgeSpeedFactor;
 
                 // Play the dash animation
@@ -61,7 +64,7 @@ public class DodgeState : PlayerState
 
     public override PlayerState Process(Player player, double delta)
     {
-        dodgeTimeSec -= (float)delta;
+        currentDodgeTimeSec -= (float)delta;
 
         return null;
     }
@@ -69,10 +72,14 @@ public class DodgeState : PlayerState
     // Dodge the player - Affected by player's dodge type, speed factor, regular movement speed, dodge time, and movement direction
     public override PlayerState PhysicsProcess(Player player, ref Vector3 velocity, double delta)
     {
-        if (dodgeTimeSec < 0.0f)
+        if (currentDodgeTimeSec < 0.0f)
         {
             return new MoveState();
         }
+
+        // Calculate the easing factor
+        float progress = 1.0f - (currentDodgeTimeSec / totalDodgeTimeSec);
+        float easedDashSpeedFactor = Mathf.Lerp(dashSpeedFactor, 1.0f, 1.0f - Mathf.Pow(1.0f - progress, 2));
 
         Vector3 wishDirection;
         if (player.m_MovementDirection != Vector3.Zero) // if player is moving, dodge in the direction the player is moving
@@ -84,7 +91,6 @@ public class DodgeState : PlayerState
             wishDirection = -targetCameraTransform.Basis.Z.Normalized(); // Forward direction of the camera
         }
 
-
         switch (player.m_DodgeType)
         {
             case DodgeType.Roll:
@@ -92,7 +98,7 @@ public class DodgeState : PlayerState
                 // NOTE: Vertical velocity is not disabled to enable gravity, letting the player roll off ledges
                 break;
             case DodgeType.Dash:
-                player.ApplyMovementDirectionToVector(ref velocity, wishDirection, dashSpeedFactor);
+                player.ApplyMovementDirectionToVector(ref velocity, wishDirection, easedDashSpeedFactor);
                 velocity.Y = 0; // Disables vertical movement (including gravity) - IDK: Maybe another dodge type that allows vertical movement
                 break;
         }
