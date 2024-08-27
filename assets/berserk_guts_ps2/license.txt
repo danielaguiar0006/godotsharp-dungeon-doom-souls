@@ -1,0 +1,11 @@
+Model Information:
+* title:	Berserk Guts PS2
+* source:	https://sketchfab.com/3d-models/berserk-guts-ps2-d065bdd5e4e545a99aa3f3755ffd7a23
+* author:	guts2 (https://sketchfab.com/guts2)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Berserk Guts PS2" (https://sketchfab.com/3d-models/berserk-guts-ps2-d065bdd5e4e545a99aa3f3755ffd7a23) by guts2 (https://sketchfab.com/guts2) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
