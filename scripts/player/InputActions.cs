@@ -7,6 +7,7 @@ struct InputActions
     public static StringName s_MoveBackward = new StringName("move_backward");
     public static StringName s_MoveLeft = new StringName("move_left");
     public static StringName s_MoveRight = new StringName("move_right");
+    public static StringName s_MoveSprint = new StringName("move_sprint");
     public static StringName s_MoveJump = new StringName("move_jump");
     public static StringName s_MoveDodge = new StringName("move_dodge");
     public static StringName s_AttackLight = new StringName("attack_light");

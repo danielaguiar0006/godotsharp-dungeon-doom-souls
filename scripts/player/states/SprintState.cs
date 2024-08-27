@@ -1,7 +1,7 @@
 using Godot;
 using static InputActions;
 
-public class FallState : PlayerState
+public class SprintState : PlayerState
 {
     public override PlayerState OnEnterState(Player player)
     {
@@ -19,10 +19,13 @@ public class FallState : PlayerState
                 return new AttackLightState();
             }
         }
+        if (Input.IsActionJustPressed(s_MoveJump) && player.IsOnFloor())
+        {
+            return new JumpState();
+        }
 
         if (Input.IsActionJustPressed(s_MoveDodge))
         {
-            GD.Print("Dodge pressed in HandleInput");
             return new DodgeState();
         }
 
@@ -36,13 +39,17 @@ public class FallState : PlayerState
 
     public override PlayerState Process(Player player, double delta)
     {
+        if (Input.IsActionJustReleased(s_MoveSprint))
+        {
+            return new MoveState();
+        }
+
         return null;
     }
 
     public override PlayerState PhysicsProcess(Player player, ref Vector3 velocity, double delta)
     {
-        float fallSpeedMovementFactor = Input.IsActionPressed(s_MoveSprint) ? player.m_SprintSpeedFactor : 1.0f;
-        player.ApplyMovementInputToVector(ref velocity, fallSpeedMovementFactor);
+        player.ApplyMovementInputToVector(ref velocity, player.m_SprintSpeedFactor);
 
         // Transition to the idle state if the player is not moving
         if (velocity.Length() == 0)
@@ -50,10 +57,10 @@ public class FallState : PlayerState
             return new IdleState();
         }
 
-        // Transition to the move state if the player is on the floor and moving
-        if (player.IsOnFloor() && (velocity.X != 0 || velocity.Z != 0))
+        // Transition to the fall state if the player falling
+        if (!player.IsOnFloor() && velocity.Y < 0.0f)
         {
-            return new MoveState();
+            return new FallState();
         }
 
         return null;

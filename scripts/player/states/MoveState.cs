@@ -69,7 +69,12 @@ public class MoveState : PlayerState
             return new FallState();
         }
 
-        // TODO: Implement walking and running states
+        if (Input.IsActionPressed(s_MoveSprint))
+        {
+            return new SprintState();
+        }
+
+        // TODO: Implement walking state
 
         return null;
     }

@@ -9,7 +9,7 @@ public class DodgeState : PlayerState
     private float dodgeTimeSec;
 
     // Dodge speeds
-    private float rollSpeedFactor = 1.5f;
+    private float rollSpeedFactor = 1.75f;
     private float dashSpeedFactor = 5.0f;
 
     // The target camera transform, used to determine the direction the player is looking

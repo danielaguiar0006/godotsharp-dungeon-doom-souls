@@ -10,6 +10,12 @@ public partial class Player : CharacterBody3D
     [Export]
     public float m_MovementSpeed = 5.0f;
     [Export]
+    public float m_SprintSpeedFactor = 1.75f;
+    [Export]
+    public DodgeType m_DodgeType = DodgeType.Dash;
+    [Export]
+    public float m_DodgeSpeedFactor = 1.0f;
+    [Export]
     public float m_JumpVelocity = 4.0f;
 
     [ExportCategory("Camera")]
@@ -30,13 +36,13 @@ public partial class Player : CharacterBody3D
 
     // Get the gravity from the project settings to be synced with RigidBody nodes
     public float m_Gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
-
-    private PlayerState m_CurrentState = null;
-
+    // Where the player is moving towards
     public Vector3 m_MovementDirection = Vector3.Zero;
 
-    public DodgeType m_DodgeType = DodgeType.Dash;
-    public float m_DodgeSpeedFactor = 1.0f;
+    private PlayerState m_CurrentState = null;
+    // Useful values
+    private Vector3 m_CurrentVelocity = Vector3.Zero;
+    private float m_CurrentMovementSeedFactor = 0.0f;
 
 
     public override void _EnterTree()
@@ -187,6 +193,9 @@ public partial class Player : CharacterBody3D
             velocity.X = Mathf.MoveToward(velocity.X, 0, this.m_MovementSpeed * movementSpeedFactor);
             velocity.Z = Mathf.MoveToward(velocity.Z, 0, this.m_MovementSpeed * movementSpeedFactor);
         }
+
+        m_CurrentMovementSeedFactor = movementSpeedFactor;
+        m_CurrentVelocity = velocity;
     }
 
     // This does not apply movement direction directly to the player's velocity, but instead to a target vector
@@ -202,6 +211,8 @@ public partial class Player : CharacterBody3D
             velocity.X = Mathf.MoveToward(this.Velocity.X, 0, this.m_MovementSpeed * movementSpeedFactor);
             velocity.Z = Mathf.MoveToward(this.Velocity.Z, 0, this.m_MovementSpeed * movementSpeedFactor);
         }
-    }
 
+        m_CurrentMovementSeedFactor = movementSpeedFactor;
+        m_CurrentVelocity = velocity;
+    }
 }
