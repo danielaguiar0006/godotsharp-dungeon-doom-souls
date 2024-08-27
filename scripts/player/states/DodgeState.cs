@@ -77,12 +77,6 @@ public class DodgeState : PlayerState
             return new MoveState();
         }
 
-        // ------ Calculate the easing out ------
-        // Ease into sprint speed factor if sprint button is pressed or into the regular movement speed factor (usually 1.0f)
-        float easeOutTo = Input.IsActionPressed(s_MoveSprint) ? player.m_SprintSpeedFactor : player.m_MovementSpeedFactor;
-        float dashProgress = 1.0f - (currentDodgeTimeSec / totalDodgeTimeSec);
-        float easedDashSpeedFactor = Mathf.Lerp(dashSpeedFactor, easeOutTo, 1.0f - Mathf.Pow(1.0f - dashProgress, 2));
-        // --------------------------------------
 
         Vector3 wishDirection;
         if (player.m_MovementDirection != Vector3.Zero) // if player is moving, dodge in the direction the player is moving
@@ -101,6 +95,13 @@ public class DodgeState : PlayerState
                 // NOTE: Vertical velocity is not disabled to enable gravity, letting the player roll off ledges
                 break;
             case DodgeType.Dash:
+                // ------ Calculate the easing out ------
+                // Ease into sprint speed factor if sprint button is pressed or into the regular movement speed factor (usually 1.0f)
+                float easeOutTo = Input.IsActionPressed(s_MoveSprint) ? player.m_SprintSpeedFactor : player.m_MovementSpeedFactor;
+                float dashProgress = 1.0f - (currentDodgeTimeSec / totalDodgeTimeSec);
+                float easedDashSpeedFactor = Mathf.Lerp(dashSpeedFactor, easeOutTo, 1.0f - Mathf.Pow(1.0f - dashProgress, 2));
+                // --------------------------------------
+
                 player.ApplyMovementDirectionToVector(ref velocity, wishDirection, easedDashSpeedFactor);
                 velocity.Y = 0; // Disables vertical movement (including gravity) - IDK: Maybe another dodge type that allows vertical movement
                 break;
