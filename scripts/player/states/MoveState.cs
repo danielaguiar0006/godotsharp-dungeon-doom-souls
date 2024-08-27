@@ -28,6 +28,15 @@ public class MoveState : PlayerState
                 return new AttackLightState();
             }
         }
+        if (Input.IsActionJustPressed(s_MoveJump) && player.IsOnFloor())
+        {
+            return new JumpState();
+        }
+
+        if (Input.IsActionJustPressed(s_MoveDodge))
+        {
+            return new DodgeState();
+        }
 
         return null;
     }
@@ -60,17 +69,8 @@ public class MoveState : PlayerState
             return new FallState();
         }
 
-        if (Input.IsActionJustPressed(s_MoveJump) && player.IsOnFloor())
-        {
-            return new JumpState();
-        }
-
-        if (Input.IsActionJustPressed(s_MoveDodge))
-        {
-            return new DodgeState();
-        }
-
         // TODO: Implement walking and running states
+
         return null;
     }
 

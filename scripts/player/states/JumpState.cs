@@ -30,6 +30,11 @@ public class JumpState : PlayerState
             }
         }
 
+        if (Input.IsActionJustPressed(s_MoveDodge))
+        {
+            return new DodgeState();
+        }
+
         return null;
     }
 
@@ -74,11 +79,6 @@ public class JumpState : PlayerState
         if (!player.IsOnFloor() && velocity.Y < 0.0f)
         {
             return new FallState();
-        }
-
-        if (Input.IsActionJustPressed(s_MoveDodge))
-        {
-            return new DodgeState();
         }
 
         return null;

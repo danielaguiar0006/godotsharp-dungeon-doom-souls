@@ -9,7 +9,17 @@ public class PlayerState
         return null;
     }
 
-    // For gameplay input - That isn't already handled by Godot through the InputMap system.
+    // NOTE: These Input functions are the preferred way to handle SUDDEN input in Godot;
+    // NOT for continuous input (like moving the player character). For continuous input,
+    // use _Process() or _PhysicsProcess().
+    //
+    // !: Checking for sudden input in PhysicsProcess() specifically can lead to missed input events.
+    //
+    // Usage ex:
+    // When pressing a mouse side button to dodge for example, HandleInput logic/code will be run;
+    // If you press a keyboard key to dodge instead, HandleKeyboardInput logic/code will be run.
+    // ----------------------------------------------------------------------------------
+    // For gameplay input, both keyboard and mouse (+controller)
     // If it is handled by the InputMap system, is should be accessible through the Input singleton.
     // returns the new state if the state changes, otherwise returns null
     public virtual PlayerState HandleInput(Player player, InputEvent @event)
@@ -18,11 +28,13 @@ public class PlayerState
     }
 
     // returns the new state if the state changes, otherwise returns null
+    // Only called if the input event is a keyboard event.
     // NOTE: To handle keyboard events, use this function instead for performance reasons.
     public virtual PlayerState HandleKeyboardInput(Player player, InputEvent @event)
     {
         return null;
     }
+    // ----------------------------------------------------------------------------------
 
     // Called during the processing step of the main loop. 
     // Processing happens at every frame and as fast as possible,

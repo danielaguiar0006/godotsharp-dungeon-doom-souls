@@ -20,6 +20,15 @@ public class IdleState : PlayerState
             }
         }
 
+        if (Input.IsActionJustPressed(s_MoveJump))
+        {
+            return new JumpState();
+        }
+        else if (Input.IsActionJustPressed(s_MoveDodge))
+        {
+            return new DodgeState();
+        }
+
         return null;
     }
 
@@ -33,14 +42,6 @@ public class IdleState : PlayerState
         if (Input.IsActionPressed(s_MoveForward) || Input.IsActionPressed(s_MoveBackward) || Input.IsActionPressed(s_MoveLeft) || Input.IsActionPressed(s_MoveRight))
         {
             return new MoveState();
-        }
-        else if (Input.IsActionJustPressed(s_MoveJump))
-        {
-            return new JumpState();
-        }
-        else if (Input.IsActionJustPressed(s_MoveDodge))
-        {
-            return new DodgeState();
         }
 
         return null;

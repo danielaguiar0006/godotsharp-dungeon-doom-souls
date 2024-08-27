@@ -20,36 +20,22 @@ public class FallState : PlayerState
             }
         }
 
-        // DEBUG: This printed out while not dodging!! so the input is being eaten
-        // This prints out for both the keyboard key and the mouse button for dodge
-        // if (Input.IsActionJustPressed(s_MoveDodge))
-        // {
-        //     GD.Print("Dodge pressed");
-        // }
+        if (Input.IsActionJustPressed(s_MoveDodge))
+        {
+            GD.Print("Dodge pressed in HandleInput");
+            return new DodgeState();
+        }
 
         return null;
     }
 
     public override PlayerState HandleKeyboardInput(Player player, InputEvent @event)
     {
-        // DEBUG: This printed out while not dodging!! so the input is being eaten
-        // This only prints out when I press the keyboard key for dodge, not the mouse button
-        // if (Input.IsActionJustPressed(s_MoveDodge))
-        // {
-        //     GD.Print("Dodge pressed");
-        // }
-
         return null;
     }
 
     public override PlayerState Process(Player player, double delta)
     {
-        // DEBUG: This printed out while not dodging!! so the input is being eaten
-        // if (Input.IsActionJustPressed(s_MoveDodge))
-        // {
-        //     GD.Print("Dodge pressed");
-        // }
-
         return null;
     }
 
@@ -68,12 +54,6 @@ public class FallState : PlayerState
         if (player.IsOnFloor() && (velocity.X != 0 || velocity.Z != 0))
         {
             return new MoveState();
-        }
-
-        // BUG: checking for Input.IsActionJustPressed in physics process causes inputs to sometimes be eaten
-        if (Input.IsActionJustPressed(s_MoveDodge))
-        {
-            return new DodgeState();
         }
 
         return null;
