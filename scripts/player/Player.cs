@@ -7,8 +7,12 @@ using ActionTypes;
 public partial class Player : CharacterBody3D
 {
     [ExportCategory("Movement")]
+    // NOTE: both moveSpeed and moveSpeedFactor affect the speed of most movement related actions
     [Export]
     public float m_MovementSpeed = 5.0f;
+    [Export]
+    public float m_MovementSpeedFactor = 1.0f;
+
     [Export]
     public float m_SprintSpeedFactor = 1.75f;
     [Export]

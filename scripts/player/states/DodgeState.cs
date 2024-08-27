@@ -11,7 +11,7 @@ public class DodgeState : PlayerState
 
     // Dodge speeds
     private float rollSpeedFactor = 1.75f;
-    private float dashSpeedFactor = 12.0f;
+    private float dashSpeedFactor = 10.0f;
 
     // The target camera transform, used to determine the direction the player is looking
     Transform3D targetCameraTransform;
@@ -39,7 +39,7 @@ public class DodgeState : PlayerState
                 break;
             case DodgeType.Dash:
                 GD.Print("Dashing!!!");
-                currentDodgeTimeSec = 0.25f;
+                currentDodgeTimeSec = 0.33f;
                 totalDodgeTimeSec = currentDodgeTimeSec;
                 dashSpeedFactor *= player.m_DodgeSpeedFactor;
 
@@ -77,9 +77,12 @@ public class DodgeState : PlayerState
             return new MoveState();
         }
 
-        // Calculate the easing factor
-        float progress = 1.0f - (currentDodgeTimeSec / totalDodgeTimeSec);
-        float easedDashSpeedFactor = Mathf.Lerp(dashSpeedFactor, 1.0f, 1.0f - Mathf.Pow(1.0f - progress, 2));
+        // ------ Calculate the easing out ------
+        // Ease into sprint speed factor if sprint button is pressed or into the regular movement speed factor (usually 1.0f)
+        float easeOutTo = Input.IsActionPressed(s_MoveSprint) ? player.m_SprintSpeedFactor : player.m_MovementSpeedFactor;
+        float dashProgress = 1.0f - (currentDodgeTimeSec / totalDodgeTimeSec);
+        float easedDashSpeedFactor = Mathf.Lerp(dashSpeedFactor, easeOutTo, 1.0f - Mathf.Pow(1.0f - dashProgress, 2));
+        // --------------------------------------
 
         Vector3 wishDirection;
         if (player.m_MovementDirection != Vector3.Zero) // if player is moving, dodge in the direction the player is moving
