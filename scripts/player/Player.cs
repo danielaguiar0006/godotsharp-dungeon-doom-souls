@@ -62,8 +62,8 @@ public partial class Player : CharacterBody3D
         Input.MouseMode = Input.MouseModeEnum.Captured;
 
         // Set Limits for the camera pitch (up and down rotation)
-        m_PitchLowerLimit = Mathf.DegToRad(-90);
-        m_PitchUpperLimit = Mathf.DegToRad(90);
+        m_PitchLowerLimit = Mathf.DegToRad(-89);
+        m_PitchUpperLimit = Mathf.DegToRad(89);
 
         // Make sure the view-port camera is set to the current camera
         m_Camera.Current = true;
@@ -140,8 +140,8 @@ public partial class Player : CharacterBody3D
         // Checking if the mouse is active
         if (@event is InputEventMouseMotion mouseInputEvent && Input.MouseMode == Input.MouseModeEnum.Captured)
         {
-            m_YawInput = -mouseInputEvent.Relative.X;
-            m_PitchInput = -mouseInputEvent.Relative.Y;
+            m_YawInput = -mouseInputEvent.ScreenRelative.X;
+            m_PitchInput = -mouseInputEvent.ScreenRelative.Y;
         }
         else
         { // Reset the mouse input if the mouse is not active
