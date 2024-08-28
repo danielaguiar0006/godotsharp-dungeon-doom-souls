@@ -1,6 +1,7 @@
 using Godot;
 using static InputActions;
-using ActionTypes;
+using Game.ActionTypes;
+using Game.StatsAndAttributes;
 
 
 public class DodgeState : PlayerState
@@ -91,13 +92,15 @@ public class DodgeState : PlayerState
         switch (player.m_DodgeType)
         {
             case DodgeType.Roll:
+                //rollSpeedFactor *= player.m_Stats.GetSpecialStatAmountFactors()[SpecialStatType.MovementSpeedFactor];
                 player.ApplyMovementDirectionToVector(ref velocity, wishDirection, rollSpeedFactor);
                 // NOTE: Vertical velocity is not disabled to enable gravity, letting the player roll off ledges
                 break;
             case DodgeType.Dash:
                 // ------ Calculate the easing out ------
                 // Ease into sprint speed factor if sprint button is pressed or into the regular movement speed factor (usually 1.0f)
-                float easeOutTo = Input.IsActionPressed(s_MoveSprint) ? player.m_SprintSpeedFactor : player.m_MovementSpeedFactor;
+                //float easeOutTo = Input.IsActionPressed(s_MoveSprint) ? player.m_SprintSpeedFactor : player.m_Stats.GetSpecialStatAmountFactors()[SpecialStatType.MovementSpeedFactor];
+                float easeOutTo = Input.IsActionPressed(s_MoveSprint) ? player.m_SprintSpeedFactor : 1.0f;
                 float dashProgress = 1.0f - (currentDodgeTimeSec / totalDodgeTimeSec);
                 float easedDashSpeedFactor = Mathf.Lerp(dashSpeedFactor, easeOutTo, 1.0f - Mathf.Pow(1.0f - dashProgress, 2));
                 // --------------------------------------

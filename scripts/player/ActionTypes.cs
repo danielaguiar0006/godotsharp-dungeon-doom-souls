@@ -1,4 +1,4 @@
-namespace ActionTypes
+namespace Game.ActionTypes
 {
     public enum DodgeType
     {

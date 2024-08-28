@@ -3,6 +3,7 @@ using Godot;
 struct InputActions
 {
     // Static Strings For Garbage Collection Optimization - Godot uses custom strings for actions which causes potential GC problems
+    public static StringName s_ToggleDebugInfo = new StringName("toggle_debug_info");
     public static StringName s_MoveForward = new StringName("move_forward");
     public static StringName s_MoveBackward = new StringName("move_backward");
     public static StringName s_MoveLeft = new StringName("move_left");

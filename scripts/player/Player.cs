@@ -1,18 +1,16 @@
 using Godot;
 using static InputActions;
-using ActionTypes;
+using Game.ActionTypes;
+using Game.StatsAndAttributes;
 
 // NOTE: The reason for all the public variables is so that player data can be easily
 // read and modified in the individual states (i.e. IdleState, MoveState, etc...).
-public partial class Player : CharacterBody3D
+public partial class Player : Mob
 {
     [ExportCategory("Movement")]
     // NOTE: both moveSpeed and moveSpeedFactor affect the speed of most movement related actions
     [Export]
     public float m_MovementSpeed = 5.0f;
-    [Export]
-    public float m_MovementSpeedFactor = 1.0f;
-
     [Export]
     public float m_SprintSpeedFactor = 1.75f;
     [Export]
@@ -46,10 +44,12 @@ public partial class Player : CharacterBody3D
     private PlayerState m_CurrentState = null;
     // Useful values
     private Vector3 m_CurrentVelocity = Vector3.Zero;
-    private float m_CurrentMovementSeedFactor = 0.0f;
+    private float m_CurrentMovementSpeedFactor = 0.0f;
 
     // TODO: Turn this into an inventory class which handles storing items, equiping, and unequiping items:
     public Item[] m_EquipedItems;
+
+    private bool m_ShowDebugInfo = false;
 
     public override void _EnterTree()
     {
@@ -99,14 +99,37 @@ public partial class Player : CharacterBody3D
             m_CurrentState = newState;
             m_CurrentState.OnEnterState(this);
         }
+
+        if (Input.IsActionPressed(s_ToggleDebugInfo))
+        {
+            m_ShowDebugInfo = !m_ShowDebugInfo;
+        }
     }
 
     public override void _Process(double delta)
     {
-        // DEBUG: Information about the current state on the screen
-        this.GetNode<Label>("CurrentStateDebugInfo").Text = "Current State: " + m_CurrentState.GetType().Name;
-        // DEBUG: Show if the player is on the floor currently
-        this.GetNode<Label>("IsOnFloorDebugInfo").Text = "On Floor: " + this.IsOnFloor().ToString();
+        // TODO: MAKE THIS NICER/CLEANUP
+        // DEBUG: Show debug info
+        if (m_ShowDebugInfo)
+        {
+            ShowDebugInfo();
+
+            float movementSpeedFactor = m_Stats.GetSpecialStatAmountFactors()[SpecialStatType.MovementSpeedFactor];
+            if (Input.IsPhysicalKeyPressed(Key.Up))
+            {
+                m_Stats.SetSpecialStatAmountFactor(SpecialStatType.MovementSpeedFactor, movementSpeedFactor + 0.001f);
+            }
+            else if (Input.IsPhysicalKeyPressed(Key.Down))
+            {
+                m_Stats.SetSpecialStatAmountFactor(SpecialStatType.MovementSpeedFactor, movementSpeedFactor - 0.001f);
+            }
+        }
+        else
+        {
+            this.GetNode<Label>("CurrentStateDebugInfo").Text = "";
+            this.GetNode<Label>("IsOnFloorDebugInfo").Text = "";
+            this.GetNode<Label>("StatsDebugInfo").Text = "";
+        }
 
         PlayerState newState = m_CurrentState.Process(this, delta);
         if (newState != null)
@@ -184,8 +207,13 @@ public partial class Player : CharacterBody3D
     }
 
     // This does not apply input movement directly to the player's velocity, but instead to a target vector
-    public void ApplyMovementInputToVector(ref Vector3 velocity, float movementSpeedFactor = 1.0f)
+    public void ApplyMovementInputToVector(ref Vector3 velocity, float movementSpeedFactor = 1.0f, bool applyStatMovementSpeedFactor = true)
     {
+        if (applyStatMovementSpeedFactor)
+        {
+            movementSpeedFactor *= base.m_Stats.GetSpecialStatAmountFactors()[SpecialStatType.MovementSpeedFactor];
+        }
+
         // Get the input direction and handle the movement/deceleration.
         Vector2 inputDir = Input.GetVector(s_MoveLeft, s_MoveRight, s_MoveForward, s_MoveBackward);
         this.m_MovementDirection = (this.Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
@@ -200,13 +228,20 @@ public partial class Player : CharacterBody3D
             velocity.Z = Mathf.MoveToward(velocity.Z, 0, this.m_MovementSpeed * movementSpeedFactor);
         }
 
-        m_CurrentMovementSeedFactor = movementSpeedFactor;
+        m_CurrentMovementSpeedFactor = movementSpeedFactor;
         m_CurrentVelocity = velocity;
     }
 
     // This does not apply movement direction directly to the player's velocity, but instead to a target vector
-    public void ApplyMovementDirectionToVector(ref Vector3 velocity, Vector3 wishDirection, float movementSpeedFactor = 1.0f)
+    // This also does not apply the player's stat: MovementSpeedFactor on top of the local movementSpeedFactor,
+    // if you do want to apply the player's MovementSpeedFactor, manually apply it or use ApplyMovementInputToVector instead.
+    public void ApplyMovementDirectionToVector(ref Vector3 velocity, Vector3 wishDirection, float movementSpeedFactor = 1.0f, bool applyStatMovementSpeedFactor = true)
     {
+        if (applyStatMovementSpeedFactor)
+        {
+            movementSpeedFactor *= base.m_Stats.GetSpecialStatAmountFactors()[SpecialStatType.MovementSpeedFactor];
+        }
+
         if (wishDirection != Vector3.Zero)
         {
             velocity.X = wishDirection.X * this.m_MovementSpeed * movementSpeedFactor;
@@ -218,7 +253,47 @@ public partial class Player : CharacterBody3D
             velocity.Z = Mathf.MoveToward(this.Velocity.Z, 0, this.m_MovementSpeed * movementSpeedFactor);
         }
 
-        m_CurrentMovementSeedFactor = movementSpeedFactor;
+        m_CurrentMovementSpeedFactor = movementSpeedFactor;
         m_CurrentVelocity = velocity;
+    }
+
+    private void ShowDebugInfo()
+    {
+        // DEBUG: Show the player's current velocity
+        // TODO: this.GetNode<Label>("VelocityDebugInfo").Text = "Velocity: " + m_CurrentVelocity;
+
+        // DEBUG: Show the player's current movement speed factor
+        // TODO: this.GetNode<Label>("MovementSpeedFactorDebugInfo").Text = "Movement Speed Factor: " + m_CurrentMovementSpeedFactor;
+
+        // DEBUG: Information about the current state on the screen
+        this.GetNode<Label>("CurrentStateDebugInfo").Text = "Current State: " + m_CurrentState.GetType().Name;
+        // DEBUG: Show if the player is on the floor currently
+        var floorDebugLabel = this.GetNode<Label>("IsOnFloorDebugInfo");
+        if (this.IsOnFloor())
+        {
+            floorDebugLabel.AddThemeColorOverride("font_color", new Color(0, 1, 0));
+            floorDebugLabel.Text = "On Floor: True";
+        }
+        else
+        {
+            floorDebugLabel.AddThemeColorOverride("font_color", new Color(1, 0, 0));
+            floorDebugLabel.Text = "On Floor: False";
+        }
+
+        // Debug: Show the Player's Stats info
+        string statsInfo = "PLAYER STATS:\n";
+        foreach (var stat in m_Stats.GetCurrentBaseStatValues())
+        {
+            statsInfo += stat.Key.ToString() + ": " + stat.Value + "\n";
+        }
+        foreach (var stat in m_Stats.GetCurrentAttributeLevels())
+        {
+            statsInfo += stat.Key.ToString() + ": " + stat.Value + "\n";
+        }
+        foreach (var stat in m_Stats.GetSpecialStatAmountFactors())
+        {
+            statsInfo += stat.Key.ToString() + ": " + stat.Value + "\n";
+        }
+        this.GetNode<Label>("StatsDebugInfo").Text = statsInfo;
     }
 }

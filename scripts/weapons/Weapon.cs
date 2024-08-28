@@ -1,5 +1,5 @@
 using Godot;
-using StatsAndAttributes;
+using Game.StatsAndAttributes;
 
 public partial class Weapon : Item
 {
@@ -19,7 +19,7 @@ public partial class Weapon : Item
         m_IsCurrentlyEquipped = false;
     }
 
-    public void Equip(Mob owner)
+    public void Equip(ref Mob owner)
     {
         m_Owner = owner;
         m_IsCurrentlyEquipped = true;
@@ -31,7 +31,16 @@ public partial class Weapon : Item
         m_IsCurrentlyEquipped = false;
     }
 
-    public void AttackLight()
+    public virtual void AttackLight()
+    {
+        m_Owner.Attack(m_Stats.GetLightAttackDamage(), m_Owner);
+        //TODO: attackstate length
+    }
+    public virtual void AttackHeavy()
+    {
+        //TODO: attackstate length
+    }
+    public virtual void AttackSpeacial()
     {
         //TODO: attackstate length
     }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
+using Game.DamageSystem;
 
-namespace StatsAndAttributes
+namespace Game.StatsAndAttributes
 {
     public enum BaseStatType
     {
@@ -25,9 +26,9 @@ namespace StatsAndAttributes
 
     public enum SpecialStatType
     {
-        SpeedMultiplier,
+        MovementSpeedFactor,
         CritChance,
-        CritDamageMultiplier,
+        CritDamageFactor,
         BlockPhysicalAmount,
         // MagicCritChance,
         // MagicCritDamage,
@@ -72,19 +73,27 @@ namespace StatsAndAttributes
             { AttributeType.Charisma, 1 }
         };
 
-        // Mob Special Stats
+        // Mob Special Stats - Special stats are modifiers with different effects and implementations
         private Dictionary<SpecialStatType, float> m_SpecialStatTypeToAmountFactor = new Dictionary<SpecialStatType, float>() {
-            { SpecialStatType.SpeedMultiplier, 1.0f },
-            { SpecialStatType.CritChance, 0.1f },
-            { SpecialStatType.CritDamageMultiplier, 2.0f },
-            { SpecialStatType.BlockPhysicalAmount, 0.5f },
+            // NOTE: Special stats are implemented in completely different ways, so check specific implemntation before editing values
+
+            // ------ Movement ------
+            { SpecialStatType.MovementSpeedFactor, 1.0f }, // Multiplier of movement speed (1.0f = regular movement speed ; 2.0f = double movemnet speed)
+            // ----------------------
+            // ------ Physical Damage ------
+            { SpecialStatType.CritChance, 0.1f }, // Min: 0.0f, Max: 1.0f (0% - 100%)
+            { SpecialStatType.CritDamageFactor, 1.5f }, // Multiplier of damage on crit (2.0f = 2x more damage on crit)
+            { SpecialStatType.BlockPhysicalAmount, 0.5f }, // Amount of physical damage blocked when blocking (0.5f = 50% damage reduction)
+            // -----------------------------
+            // ------ Magic ------
             // { SpecialStatType.MagicCritChance, 1.0f },
             // { SpecialStatType.MagicCritDamage, 1.0f },
             // { SpecialStatType.MagicBlockAmount, 1.0f },
-            // { SpecialStatType.HealthRegen, 1.0f },
-            // { SpecialStatType.ManaRegen, 1.0f },
-            // { SpecialStatType.StaminaRegen, 1.0f },
-            // { SpecialStatType.EquipWeightModifier, 1.0f },
+            // -------------------
+            // { SpecialStatType.HealthRegenFactor, 1.0f },
+            // { SpecialStatType.ManaRegenFactor, 1.0f },
+            // { SpecialStatType.StaminaRegenFactor, 1.2f },
+            // { SpecialStatType.EquipWeightFactor, 1.0f },
             // { SpecialStatType.Luck, 1.0f }
         };
 
@@ -121,27 +130,25 @@ namespace StatsAndAttributes
             Projectile
         }
 
-        // m_DamageTypeToDamageAmount 
-        // NOTE: DamageTable is passed by reference to the Attacking Mob so that they can apply their own damage modifiers/effects,
-        // then the table is once again passed by reference to the Attacked Mob so that they can apply their own resistance modifiers/effects
-        private Dictionary<DamageType, float> m_DamageTable = new Dictionary<DamageType, float>() {
-            { DamageType.Physical, 0.0f },
-            { DamageType.Fire, 0.0f },
-            { DamageType.Ice, 0.0f },
-            { DamageType.Lightning, 0.0f }
-        };
-
         private int m_WeaponLevel = 1;
         private WeaponType m_WeaponType;
+        private Damage m_LightAttackDamage;
+        private Damage m_HeavyAttackDamage;
+        private Damage m_SpecialAttackDamage;
+
 
         // Getters
         public int GetWeaponLevel() { return m_WeaponLevel; }
         public WeaponType GetWeaponType() { return m_WeaponType; }
-        public ref Dictionary<DamageType, float> GetDamageTable() { return ref m_DamageTable; }
+        public Damage GetLightAttackDamage() { return m_LightAttackDamage; }
+        public Damage GetHeavyAttackDamage() { return m_HeavyAttackDamage; }
+        public Damage GetSpecialAttackDamage() { return m_SpecialAttackDamage; }
 
         // Setters
         public void SetWeaponLevel(int level) { m_WeaponLevel = level; }
         public void SetWeaponType(WeaponType weaponType) { m_WeaponType = weaponType; }
-        public void SetDamageAmount(DamageType damageType, float damageAmount) { m_DamageTable[damageType] = damageAmount; }
+        public void SetLightAttackDamage(Damage damage) { m_LightAttackDamage = damage; }
+        public void SetHeavyAttackDamage(Damage damage) { m_HeavyAttackDamage = damage; }
+        public void SetSpecialAttackDamage(Damage damage) { m_SpecialAttackDamage = damage; }
     }
 }

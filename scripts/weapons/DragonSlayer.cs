@@ -1,6 +1,5 @@
 using Godot;
-using System;
-using StatsAndAttributes;
+using Game.StatsAndAttributes;
 
 public partial class DragonSlayer : Weapon
 {
