@@ -48,6 +48,8 @@ public partial class Player : CharacterBody3D
     private Vector3 m_CurrentVelocity = Vector3.Zero;
     private float m_CurrentMovementSeedFactor = 0.0f;
 
+    // TODO: Turn this into an inventory class which handles storing items, equiping, and unequiping items:
+    public Item[] m_EquipedItems;
 
     public override void _EnterTree()
     {
