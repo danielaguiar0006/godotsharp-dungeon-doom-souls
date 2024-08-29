@@ -1,5 +1,6 @@
 using Godot;
 using static InputActions;
+using Game.StatsAndAttributes;
 
 public class SprintState : PlayerState
 {
@@ -49,7 +50,7 @@ public class SprintState : PlayerState
 
     public override PlayerState PhysicsProcess(Player player, ref Vector3 velocity, double delta)
     {
-        player.ApplyMovementInputToVector(ref velocity, player.m_SprintSpeedFactor);
+        player.ApplyMovementInputToVector(ref velocity, player.m_Stats.GetSpecialStatAmountFactors()[SpecialStatType.SprintSpeedFactor]);
 
         // Transition to the idle state if the player is not moving
         if (velocity.Length() == 0)

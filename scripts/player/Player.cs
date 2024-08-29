@@ -12,11 +12,7 @@ public partial class Player : Mob
     [Export]
     public float m_MovementSpeed = 5.0f;
     [Export]
-    public float m_SprintSpeedFactor = 1.75f;
-    [Export]
     public DodgeType m_DodgeType = DodgeType.Dash;
-    [Export]
-    public float m_DodgeSpeedFactor = 1.0f;
     [Export]
     public float m_JumpVelocity = 4.0f;
 

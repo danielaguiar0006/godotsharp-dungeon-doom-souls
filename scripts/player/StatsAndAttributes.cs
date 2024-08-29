@@ -27,6 +27,9 @@ namespace Game.StatsAndAttributes
     public enum SpecialStatType
     {
         MovementSpeedFactor,
+        SprintSpeedFactor,
+        DodgeSpeedFactor,
+        //JumpHeightFactor,
         CritChance,
         CritDamageFactor,
         BlockPhysicalAmount,
@@ -78,7 +81,9 @@ namespace Game.StatsAndAttributes
             // NOTE: Special stats are implemented in completely different ways, so check specific implemntation before editing values
 
             // ------ Movement ------
-            { SpecialStatType.MovementSpeedFactor, 1.0f }, // Multiplier of movement speed (1.0f = regular movement speed ; 2.0f = double movemnet speed)
+            { SpecialStatType.MovementSpeedFactor, 1.0f }, // Multiplier of movement speed, this affects most movement by default (1.0f = regular movement speed ; 2.0f = double movemnet speed)
+            { SpecialStatType.SprintSpeedFactor, 1.75f }, // Multiplier of movement speed when sprinting (1.0f = regular movement speed ; 2.0f = double movement speed)
+            { SpecialStatType.DodgeSpeedFactor, 1.0f }, // Multiplier of dodge speed (1.0f = regular dodge speed ; 2.0f = double dodge speed)
             // ----------------------
             // ------ Physical Damage ------
             { SpecialStatType.CritChance, 0.1f }, // Min: 0.0f, Max: 1.0f (0% - 100%)

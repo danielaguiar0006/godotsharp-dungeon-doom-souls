@@ -34,7 +34,7 @@ public class DodgeState : PlayerState
                 GD.Print("Rolling!!!");
                 currentDodgeTimeSec = 0.5f;
                 totalDodgeTimeSec = currentDodgeTimeSec;
-                rollSpeedFactor *= player.m_DodgeSpeedFactor;
+                rollSpeedFactor *= player.m_Stats.GetSpecialStatAmountFactors()[SpecialStatType.DodgeSpeedFactor];
 
                 // Play the roll animation
                 break;
@@ -42,7 +42,7 @@ public class DodgeState : PlayerState
                 GD.Print("Dashing!!!");
                 currentDodgeTimeSec = 0.33f;
                 totalDodgeTimeSec = currentDodgeTimeSec;
-                dashSpeedFactor *= player.m_DodgeSpeedFactor;
+                dashSpeedFactor *= player.m_Stats.GetSpecialStatAmountFactors()[SpecialStatType.DodgeSpeedFactor];
 
                 // Play the dash animation
                 break;
@@ -99,8 +99,7 @@ public class DodgeState : PlayerState
             case DodgeType.Dash:
                 // ------ Calculate the easing out ------
                 // Ease into sprint speed factor if sprint button is pressed or into the regular movement speed factor (usually 1.0f)
-                //float easeOutTo = Input.IsActionPressed(s_MoveSprint) ? player.m_SprintSpeedFactor : player.m_Stats.GetSpecialStatAmountFactors()[SpecialStatType.MovementSpeedFactor];
-                float easeOutTo = Input.IsActionPressed(s_MoveSprint) ? player.m_SprintSpeedFactor : 1.0f;
+                float easeOutTo = Input.IsActionPressed(s_MoveSprint) ? player.m_Stats.GetSpecialStatAmountFactors()[SpecialStatType.SprintSpeedFactor] : 1.0f;
                 float dashProgress = 1.0f - (currentDodgeTimeSec / totalDodgeTimeSec);
                 float easedDashSpeedFactor = Mathf.Lerp(dashSpeedFactor, easeOutTo, 1.0f - Mathf.Pow(1.0f - dashProgress, 2));
                 // --------------------------------------
