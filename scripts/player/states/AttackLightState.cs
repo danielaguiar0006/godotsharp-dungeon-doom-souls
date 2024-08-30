@@ -1,8 +1,10 @@
 using Godot;
 using static InputActions;
+using Game.StateMachines;
+
 
 // TODO: Finish implementing first version of
-public class AttackLightState : PlayerState
+public partial class AttackLightState : PlayerState
 {
     // TODO: Read from the players equipped weapon to determine the attack time, damage, 
     // animation, etc... and have a seperate state for each specific weapon.  

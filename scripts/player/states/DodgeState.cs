@@ -2,9 +2,10 @@ using Godot;
 using static InputActions;
 using Game.ActionTypes;
 using Game.StatsAndAttributes;
+using Game.StateMachines;
 
 
-public class DodgeState : PlayerState
+public partial class DodgeState : PlayerState
 {
     // How long the dodge will last, animations and all
     private float currentDodgeTimeSec;

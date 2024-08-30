@@ -1,7 +1,9 @@
 using Godot;
 using static InputActions;
+using Game.StateMachines;
 
-public class IdleState : PlayerState
+
+public partial class IdleState : PlayerState
 {
     public override PlayerState OnEnterState(Player player)
     {

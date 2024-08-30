@@ -1,7 +1,9 @@
 using Godot;
 using static InputActions;
+using Game.StateMachines;
 
-public class MoveState : PlayerState
+
+public partial class MoveState : PlayerState
 {
     public override PlayerState OnEnterState(Player player)
     {
@@ -82,4 +84,3 @@ public class MoveState : PlayerState
     {
     }
 }
-

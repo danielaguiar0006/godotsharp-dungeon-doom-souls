@@ -2,12 +2,15 @@ using Godot;
 
 namespace Game.StateMachines
 {
-    public partial class PlayerState : MobState
+    // NOTE: This should basically only contain data/state information like a struct,
+    // It will be the child of the Item class which will contain all the functionality
+    // and for other systems like an inventory system to enforce the m_IsStackable for example
+    public partial class MobState : Node
     {
         // Called when the state is entered
-        public virtual PlayerState OnEnterState(Player player)
+        public virtual MobState OnEnterState(Mob mob)
         {
-            // Change the player's animation state here for example
+            // Change the mob's animation state here for example
             return null;
         }
 
@@ -24,7 +27,7 @@ namespace Game.StateMachines
         // For gameplay input, both keyboard and mouse (+controller)
         // If it is handled by the InputMap system, is should be accessible through the Input singleton.
         // returns the new state if the state changes, otherwise returns null
-        public virtual PlayerState HandleInput(Player player, InputEvent @event)
+        public virtual MobState HandleInput(Mob mob, InputEvent @event)
         {
             return null;
         }
@@ -32,7 +35,7 @@ namespace Game.StateMachines
         // returns the new state if the state changes, otherwise returns null
         // Only called if the input event is a keyboard event.
         // NOTE: To handle keyboard events, use this function instead for performance reasons.
-        public virtual PlayerState HandleKeyboardInput(Player player, InputEvent @event)
+        public virtual MobState HandleKeyboardInput(Mob mob, InputEvent @event)
         {
             return null;
         }
@@ -42,7 +45,7 @@ namespace Game.StateMachines
         // Processing happens at every frame and as fast as possible,
         // so the `delta` time since the previous frame is not constant (`delta` is in seconds).
         // returns the new state if the state changes, otherwise returns null
-        public virtual PlayerState Process(Player player, double delta)
+        public virtual MobState Process(Mob mob, double delta)
         {
             return null;
         }
@@ -51,13 +54,13 @@ namespace Game.StateMachines
         // Physics processing means that the frame rate is synced to the physics,
         // i.e. the `delta` variable should be constant (`delta` is in seconds).
         // returns the new state if the state changes, otherwise returns null
-        public virtual PlayerState PhysicsProcess(Player player, ref Vector3 velocity, double delta)
+        public virtual MobState PhysicsProcess(Mob mob, ref Vector3 velocity, double delta)
         {
             return null;
         }
 
         // Called when the state is exited - Clean up any state-specific resources here
-        public virtual void OnExitState(Player player)
+        public virtual void OnExitState(Mob mob)
         {
             // Clean up any state-specific resources here
         }

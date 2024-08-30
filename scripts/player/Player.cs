@@ -2,6 +2,7 @@ using Godot;
 using static InputActions;
 using Game.ActionTypes;
 using Game.StatsAndAttributes;
+using Game.StateMachines;
 
 // NOTE: The reason for all the public variables is so that player data can be easily
 // read and modified in the individual states (i.e. IdleState, MoveState, etc...).

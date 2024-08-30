@@ -1,8 +1,10 @@
 using Godot;
 using static InputActions;
 using Game.StatsAndAttributes;
+using Game.StateMachines;
 
-public class FallState : PlayerState
+
+public partial class FallState : PlayerState
 {
     public override PlayerState OnEnterState(Player player)
     {
@@ -63,4 +65,3 @@ public class FallState : PlayerState
     {
     }
 }
-

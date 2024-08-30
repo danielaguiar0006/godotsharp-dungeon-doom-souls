@@ -1,8 +1,10 @@
 using Godot;
 using static InputActions;
 using Game.StatsAndAttributes;
+using Game.StateMachines;
 
-public class SprintState : PlayerState
+
+public partial class SprintState : PlayerState
 {
     public override PlayerState OnEnterState(Player player)
     {
@@ -71,4 +73,3 @@ public class SprintState : PlayerState
     {
     }
 }
-

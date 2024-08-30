@@ -1,8 +1,10 @@
 using Godot;
 using static InputActions;
 using Game.StatsAndAttributes;
+using Game.StateMachines;
 
-public class JumpState : PlayerState
+
+public partial class JumpState : PlayerState
 {
     float appliedJumpVelocityTimeSec;  // Time in seconds that the jump velocity will be applied to the player
     float jumpVelocity;                // The velocity that will be applied to the player when jumping
