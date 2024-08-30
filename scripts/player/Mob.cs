@@ -1,4 +1,5 @@
 using Godot;
+using static InputActions;
 using Game.StatsAndAttributes;
 using Game.DamageSystem;
 
@@ -16,6 +17,13 @@ public partial class Mob : CharacterBody3D
     public MobStats m_Stats = new MobStats();
     protected bool m_IsAlive = true;
     protected bool m_IsHostile = true;
+
+    public float m_MovementSpeed = 5.0f;
+    // Where the mob is moving towards
+    public Vector3 m_MovementDirection = Vector3.Zero;
+
+    // Get the gravity from the project settings to be synced with RigidBody nodes
+    public float m_Gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
 
 
     public void TakeDamage(ref Damage damage)
@@ -42,7 +50,7 @@ public partial class Mob : CharacterBody3D
 
         // Apply updated health
         m_Stats.SetCurrentBaseStatValue(BaseStatType.Health, currentHealth);
-        GD.Print("Player Health: " + m_Stats.GetCurrentBaseStatValues()[BaseStatType.Health]);
+        GD.Print("Mob's Health: " + m_Stats.GetCurrentBaseStatValues()[BaseStatType.Health]);
 
         if (currentHealth <= 0.0f)
         {
@@ -113,4 +121,67 @@ public partial class Mob : CharacterBody3D
     {
         m_IsHostile = isHostile;
     }
+
+    // moveSpeedFactor can be used for slower or faster movement (walking, running, etc...)
+    public void ApplyMobMovement(ref Vector3 velocity)
+    {
+        // Move the mob
+        this.Velocity = velocity;
+        this.MoveAndSlide();
+    }
+
+    // Helper function to apply gravity to a vector in different states
+    // This does not apply gravity directly to the mob's velocity, but instead to a target vector
+    public void ApplyGravityToVector(ref Vector3 velocity, double delta)
+    {
+        // Add the gravity
+        if (!this.IsOnFloor())
+            velocity.Y -= this.m_Gravity * (float)delta;
+    }
+
+    // This does not apply input movement directly to the mob's velocity, but instead to a target vector
+    public void ApplyMovementInputToVector(ref Vector3 velocity, float movementSpeedFactor = 1.0f, bool applyStatMovementSpeedFactor = true)
+    {
+        if (applyStatMovementSpeedFactor)
+        {
+            movementSpeedFactor *= m_Stats.GetSpecialStatAmountFactors()[SpecialStatType.MovementSpeedFactor];
+        }
+
+        // Get the input direction and handle the movement/deceleration.
+        Vector2 inputDir = Input.GetVector(s_MoveLeft, s_MoveRight, s_MoveForward, s_MoveBackward);
+        this.m_MovementDirection = (this.Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
+        if (this.m_MovementDirection != Vector3.Zero)
+        {
+            velocity.X = m_MovementDirection.X * m_MovementSpeed * movementSpeedFactor;
+            velocity.Z = this.m_MovementDirection.Z * this.m_MovementSpeed * movementSpeedFactor;
+        }
+        else  // If the mob is not moving, decelerate
+        {
+            velocity.X = Mathf.MoveToward(velocity.X, 0, this.m_MovementSpeed * movementSpeedFactor);
+            velocity.Z = Mathf.MoveToward(velocity.Z, 0, this.m_MovementSpeed * movementSpeedFactor);
+        }
+    }
+
+    // This does not apply movement direction directly to the mob's velocity, but instead to a target vector
+    // This also does not apply the mob's stat: MovementSpeedFactor on top of the local movementSpeedFactor,
+    // if you do want to apply the mob's MovementSpeedFactor, manually apply it or use ApplyMovementInputToVector instead.
+    public void ApplyMovementDirectionToVector(ref Vector3 velocity, Vector3 wishDirection, float movementSpeedFactor = 1.0f, bool applyStatMovementSpeedFactor = true)
+    {
+        if (applyStatMovementSpeedFactor)
+        {
+            movementSpeedFactor *= m_Stats.GetSpecialStatAmountFactors()[SpecialStatType.MovementSpeedFactor];
+        }
+
+        if (wishDirection != Vector3.Zero)
+        {
+            velocity.X = wishDirection.X * this.m_MovementSpeed * movementSpeedFactor;
+            velocity.Z = wishDirection.Z * this.m_MovementSpeed * movementSpeedFactor;
+        }
+        else
+        {
+            velocity.X = Mathf.MoveToward(this.Velocity.X, 0, this.m_MovementSpeed * movementSpeedFactor);
+            velocity.Z = Mathf.MoveToward(this.Velocity.Z, 0, this.m_MovementSpeed * movementSpeedFactor);
+        }
+    }
+
 }

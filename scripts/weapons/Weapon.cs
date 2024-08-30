@@ -33,7 +33,7 @@ public partial class Weapon : Item
 
     public virtual void AttackLight()
     {
-        m_Owner.Attack(m_Stats.GetLightAttackDamage(), m_Owner);
+        // m_Owner.Attack(m_Stats.GetLightAttackDamage(), );
         //TODO: attackstate length
     }
     public virtual void AttackHeavy()

@@ -10,8 +10,6 @@ public partial class Player : Mob
     [ExportCategory("Movement")]
     // NOTE: both moveSpeed and moveSpeedFactor affect the speed of most movement related actions
     [Export]
-    public float m_MovementSpeed = 5.0f;
-    [Export]
     public DodgeType m_DodgeType = DodgeType.Dash;
     [Export]
     public float m_JumpVelocity = 4.0f;
@@ -26,26 +24,22 @@ public partial class Player : Mob
     [Export]
     public RayCast3D m_Raycast;
 
+    private PlayerState m_CurrentState = null;
+    // TODO: Turn this into an inventory class which handles storing items, equiping, and unequiping items:
+    private Item[] m_EquipedItems;
+
     // Aiming/Camera input
     public float m_YawInput = 0.0f;
     public float m_PitchInput = 0.0f;
     public float m_PitchLowerLimit = 0.0f;
     public float m_PitchUpperLimit = 0.0f;
 
-    // Get the gravity from the project settings to be synced with RigidBody nodes
-    public float m_Gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
-    // Where the player is moving towards
-    public Vector3 m_MovementDirection = Vector3.Zero;
 
-    private PlayerState m_CurrentState = null;
     // Useful values
-    private Vector3 m_CurrentVelocity = Vector3.Zero;
-    private float m_CurrentMovementSpeedFactor = 0.0f;
-
-    // TODO: Turn this into an inventory class which handles storing items, equiping, and unequiping items:
-    public Item[] m_EquipedItems;
-
+    //private Vector3 m_CurrentVelocity = Vector3.Zero;
+    //private float m_CurrentMovementSpeedFactor = 0.0f;
     private bool m_ShowDebugInfo = false;
+
 
     public override void _EnterTree()
     {
@@ -152,7 +146,7 @@ public partial class Player : Mob
 
         // Apply gravity and movement
         ApplyGravityToVector(ref velocity, delta);
-        ApplyPlayerMovement(ref velocity);
+        ApplyMobMovement(ref velocity);
     }
 
     // Helper funciton to aim the camera through mouse/controller input
@@ -182,75 +176,6 @@ public partial class Player : Mob
         Vector3 cameraRotation = m_CameraPivot.Rotation;
         cameraRotation.X = Mathf.Clamp(cameraRotation.X, m_PitchLowerLimit, m_PitchUpperLimit);
         m_CameraPivot.Rotation = cameraRotation;
-    }
-
-
-    // moveSpeedFactor can be used for slower or faster movement (walking, running, etc...)
-    public void ApplyPlayerMovement(ref Vector3 velocity)
-    {
-        // Move the player
-        this.Velocity = velocity;
-        this.MoveAndSlide();
-    }
-
-    // Helper function to apply gravity to a vector in different states
-    // This does not apply gravity directly to the player's velocity, but instead to a target vector
-    public void ApplyGravityToVector(ref Vector3 velocity, double delta)
-    {
-        // Add the gravity
-        if (!this.IsOnFloor())
-            velocity.Y -= this.m_Gravity * (float)delta;
-    }
-
-    // This does not apply input movement directly to the player's velocity, but instead to a target vector
-    public void ApplyMovementInputToVector(ref Vector3 velocity, float movementSpeedFactor = 1.0f, bool applyStatMovementSpeedFactor = true)
-    {
-        if (applyStatMovementSpeedFactor)
-        {
-            movementSpeedFactor *= base.m_Stats.GetSpecialStatAmountFactors()[SpecialStatType.MovementSpeedFactor];
-        }
-
-        // Get the input direction and handle the movement/deceleration.
-        Vector2 inputDir = Input.GetVector(s_MoveLeft, s_MoveRight, s_MoveForward, s_MoveBackward);
-        this.m_MovementDirection = (this.Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
-        if (this.m_MovementDirection != Vector3.Zero)
-        {
-            velocity.X = this.m_MovementDirection.X * this.m_MovementSpeed * movementSpeedFactor;
-            velocity.Z = this.m_MovementDirection.Z * this.m_MovementSpeed * movementSpeedFactor;
-        }
-        else  // If the player is not moving, decelerate
-        {
-            velocity.X = Mathf.MoveToward(velocity.X, 0, this.m_MovementSpeed * movementSpeedFactor);
-            velocity.Z = Mathf.MoveToward(velocity.Z, 0, this.m_MovementSpeed * movementSpeedFactor);
-        }
-
-        m_CurrentMovementSpeedFactor = movementSpeedFactor;
-        m_CurrentVelocity = velocity;
-    }
-
-    // This does not apply movement direction directly to the player's velocity, but instead to a target vector
-    // This also does not apply the player's stat: MovementSpeedFactor on top of the local movementSpeedFactor,
-    // if you do want to apply the player's MovementSpeedFactor, manually apply it or use ApplyMovementInputToVector instead.
-    public void ApplyMovementDirectionToVector(ref Vector3 velocity, Vector3 wishDirection, float movementSpeedFactor = 1.0f, bool applyStatMovementSpeedFactor = true)
-    {
-        if (applyStatMovementSpeedFactor)
-        {
-            movementSpeedFactor *= base.m_Stats.GetSpecialStatAmountFactors()[SpecialStatType.MovementSpeedFactor];
-        }
-
-        if (wishDirection != Vector3.Zero)
-        {
-            velocity.X = wishDirection.X * this.m_MovementSpeed * movementSpeedFactor;
-            velocity.Z = wishDirection.Z * this.m_MovementSpeed * movementSpeedFactor;
-        }
-        else
-        {
-            velocity.X = Mathf.MoveToward(this.Velocity.X, 0, this.m_MovementSpeed * movementSpeedFactor);
-            velocity.Z = Mathf.MoveToward(this.Velocity.Z, 0, this.m_MovementSpeed * movementSpeedFactor);
-        }
-
-        m_CurrentMovementSpeedFactor = movementSpeedFactor;
-        m_CurrentVelocity = velocity;
     }
 
     private void ShowDebugInfo()
