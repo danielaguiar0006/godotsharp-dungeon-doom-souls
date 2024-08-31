@@ -26,8 +26,6 @@ public partial class Player : Mob
     public RayCast3D m_Raycast;
 
     private PlayerState m_CurrentState = null;
-    // TODO: Turn this into an inventory class which handles storing items, equiping, and unequiping items:
-    private Item[] m_EquipedItems;
 
     // Aiming/Camera input
     public float m_YawInput = 0.0f;
@@ -217,5 +215,12 @@ public partial class Player : Mob
             statsInfo += stat.Key.ToString() + ": " + stat.Value + "\n";
         }
         this.GetNode<Label>("StatsDebugInfo").Text = statsInfo;
+
+
+        GD.Print("Player Equipped Items:");
+        foreach (var item in m_EquipedItems)
+        {
+            GD.Print(item.Key + ": " + item.Value.m_ItemName);
+        }
     }
 }
