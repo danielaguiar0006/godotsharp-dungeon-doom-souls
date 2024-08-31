@@ -1,7 +1,7 @@
 using Godot;
 using static InputActions;
 using Game.ActionTypes;
-using Game.StatsAndAttributes;
+using Game.StatsManager;
 using Game.StateMachines;
 
 

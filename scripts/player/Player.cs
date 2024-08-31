@@ -1,7 +1,7 @@
 using Godot;
 using static InputActions;
 using Game.ActionTypes;
-using Game.StatsAndAttributes;
+using Game.StatsManager;
 using Game.StateMachines;
 
 // NOTE: The reason for all the public variables is so that player data can be easily
@@ -112,6 +112,10 @@ public partial class Player : Mob
             {
                 m_Stats.SetSpecialStatAmountFactor(SpecialStatType.MovementSpeedFactor, movementSpeedFactor - 0.001f);
             }
+            else if (Input.IsPhysicalKeyPressed(Key.Left))
+            {
+                m_Stats.SetCurrentBaseStatValue(BaseStatType.Health, m_Stats.GetCurrentBaseStatValues()[BaseStatType.Health] - 1);
+            }
         }
         else
         {
@@ -215,12 +219,5 @@ public partial class Player : Mob
             statsInfo += stat.Key.ToString() + ": " + stat.Value + "\n";
         }
         this.GetNode<Label>("StatsDebugInfo").Text = statsInfo;
-
-
-        GD.Print("Player Equipped Items:");
-        foreach (var item in m_EquipedItems)
-        {
-            GD.Print(item.Key + ": " + item.Value.m_ItemName);
-        }
     }
 }

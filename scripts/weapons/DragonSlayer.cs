@@ -1,16 +1,14 @@
 using Godot;
-using Game.StatsAndAttributes;
+using Game.StatsManager;
 
 public partial class DragonSlayer : Weapon
 {
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
-        m_ItemName = "Dragon Slayer";
+        SetItemName("Dragon Slayer");
+        SetItemSlotType(Item.ItemSlot.MainHand);
         m_Stats.SetWeaponType(WeaponStats.WeaponType.Melee);
-        m_ItemSlotType = Item.ItemSlot.MainHand; // TODO: Maybe rename to EquipmentSlotType?
-        m_IsPickupable = true;
-        m_IsEquippable = true;
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.

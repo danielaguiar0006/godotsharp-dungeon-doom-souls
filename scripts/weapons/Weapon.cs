@@ -1,5 +1,5 @@
 using Godot;
-using Game.StatsAndAttributes;
+using Game.StatsManager;
 
 public partial class Weapon : Item
 {
@@ -10,31 +10,31 @@ public partial class Weapon : Item
 
     public override void _Ready()
     {
-        m_IsEquippable = true;
-        m_IsPickupable = true;
-        m_IsDroppable = true;
+        SetIsEquippable(true);
+        SetIsPickupable(true);
+        SetIsDroppable(true);
     }
 
-    public void Equip(ref Mob owner)
+    public void EquipState(ref Mob owner)
     {
-        base.m_Owner = owner;
+        SetOwner(owner);
     }
 
-    public void Unequip()
+    public void UnequipState()
     {
-        base.m_Owner = null;
+        SetOwner(null);
     }
 
-    public virtual void AttackLight()
+    public virtual void AttackLightState()
     {
         // m_Owner.Attack(m_Stats.GetLightAttackDamage(), );
         //TODO: attackstate length
     }
-    public virtual void AttackHeavy()
+    public virtual void AttackHeavyState()
     {
         //TODO: attackstate length
     }
-    public virtual void AttackSpeacial()
+    public virtual void AttackSpeacialState()
     {
         //TODO: attackstate length
     }

@@ -31,25 +31,23 @@ public partial class Item : Node3D
     }
 
     [Export]
-    public StringName m_ItemName = "Item";
+    public StringName m_ItemName { get; private set; } = "Item";
     [Export]
-    public Mob m_Owner; // The Mob that owns this item - if null, assume it's in the world
+    public int m_MaxStackSize { get; private set; } = 1;
     [Export]
-    public Rarity m_Rarity;
+    public Mob m_Owner { get; private set; } // The Mob that owns this item - if null, assume it's in the world
     [Export]
-    public ItemSlot m_ItemSlotType;
+    public Rarity m_Rarity { get; private set; }
     [Export]
-    public int m_MaxStackSize = 1;
+    public ItemSlot m_ItemSlotType { get; private set; }
     [Export]
-    public bool m_IsEquippable = false;
+    public bool m_IsEquippable { get; private set; } = false;
     [Export]
-    public bool m_IsPickupable = false;
+    public bool m_IsPickupable { get; private set; } = false;
     [Export]
-    public bool m_IsDroppable = false;
+    public bool m_IsDroppable { get; private set; } = false;
     [Export]
-    public bool m_IsStackable = false;
-    [Export]
-    public bool m_IsConsumable = false;
+    public bool m_IsConsumable { get; private set; } = false;
     // TODO: public Texture m_GuiIcon;
 
     // Called when a body enters the Area3D - Body is any PhysicsBody3D (CharacterBody3D, RigidBody3D, etc...)
@@ -61,4 +59,17 @@ public partial class Item : Node3D
             mob.PickUpItem(this);
         }
     }
+
+    // -------------------------------------------
+    // Setters
+    // -------------------------------------------
+    public void SetItemName(StringName itemName) { m_ItemName = itemName; }
+    public void SetMaxStackSize(int maxStackSize) { m_MaxStackSize = maxStackSize; }
+    public void SetOwner(Mob owner) { m_Owner = owner; }
+    public void SetRarity(Rarity rarity) { m_Rarity = rarity; }
+    public void SetItemSlotType(ItemSlot itemSlotType) { m_ItemSlotType = itemSlotType; }
+    public void SetIsEquippable(bool isEquippable) { m_IsEquippable = isEquippable; }
+    public void SetIsPickupable(bool isPickupable) { m_IsPickupable = isPickupable; }
+    public void SetIsDroppable(bool isDroppable) { m_IsDroppable = isDroppable; }
+    public void SetIsConsumable(bool isConsumable) { m_IsConsumable = isConsumable; }
 }

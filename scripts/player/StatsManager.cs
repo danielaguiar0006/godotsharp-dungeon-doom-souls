@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Game.DamageSystem;
 
-namespace Game.StatsAndAttributes
+namespace Game.StatsManager
 {
     public enum BaseStatType
     {
@@ -45,7 +45,6 @@ namespace Game.StatsAndAttributes
 
     public class MobStats
     {
-
         // Every level, adds 10% effectiveness if applicable
         public const float LEVEL_EFFECT_FACTOR = 1.1f;
 
