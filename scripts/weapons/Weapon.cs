@@ -8,11 +8,17 @@ public partial class Weapon : Item
     protected Animation m_Animation;
 
 
-    public override void _Ready()
+    public Weapon()
     {
         SetIsEquippable(true);
         SetIsPickupable(true);
         SetIsDroppable(true);
+        // m_HitBox = GetNode<Area3D>("HitBox");
+        // m_Animation = GetNode<Animation>("Animation");
+    }
+
+    public override void _Ready()
+    {
     }
 
     public void EquipState(ref Mob owner)
