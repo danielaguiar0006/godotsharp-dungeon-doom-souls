@@ -33,7 +33,6 @@ public partial class Player : Mob
     private float m_PitchUpperLimit = 0.0f;
 
     // Useful values
-    private bool m_ShowDebugInfo = false;
     //private Vector3 m_CurrentVelocity = Vector3.Zero;
     //private float m_CurrentMovementSpeedFactor = 0.0f;
 
@@ -87,41 +86,10 @@ public partial class Player : Mob
             m_CurrentState.OnEnterState(this);
         }
 
-        if (Input.IsActionPressed(s_ToggleDebugInfo))
-        {
-            m_ShowDebugInfo = !m_ShowDebugInfo;
-        }
     }
 
     public override void _Process(double delta)
     {
-        // TODO: MAKE THIS NICER/CLEANUP
-        // DEBUG: Show debug info
-        if (m_ShowDebugInfo)
-        {
-            ShowDebugInfo();
-
-            float movementSpeedFactor = m_MobStats.m_SpecialStatTypeToAmountFactor[SpecialStatType.MovementSpeedFactor];
-            if (Input.IsPhysicalKeyPressed(Key.Up))
-            {
-                m_MobStats.SetSpecialStatAmountFactor(SpecialStatType.MovementSpeedFactor, movementSpeedFactor + 0.001f);
-            }
-            else if (Input.IsPhysicalKeyPressed(Key.Down))
-            {
-                m_MobStats.SetSpecialStatAmountFactor(SpecialStatType.MovementSpeedFactor, movementSpeedFactor - 0.001f);
-            }
-            else if (Input.IsPhysicalKeyPressed(Key.Left))
-            {
-                m_MobStats.SetCurrentBaseStatValue(BaseStatType.Health, m_MobStats.m_BaseStatTypeToCurrentValue[BaseStatType.Health] - 1);
-            }
-        }
-        else
-        {
-            this.GetNode<Label>("CurrentStateDebugInfo").Text = "";
-            this.GetNode<Label>("IsOnFloorDebugInfo").Text = "";
-            this.GetNode<Label>("StatsDebugInfo").Text = "";
-        }
-
         PlayerState newState = m_CurrentState.Process(this, delta);
         if (newState != null)
         {
@@ -177,45 +145,5 @@ public partial class Player : Mob
         Vector3 cameraRotation = m_CameraPivot.Rotation;
         cameraRotation.X = Mathf.Clamp(cameraRotation.X, m_PitchLowerLimit, m_PitchUpperLimit);
         m_CameraPivot.Rotation = cameraRotation;
-    }
-
-    private void ShowDebugInfo()
-    {
-        // DEBUG: Show the player's current velocity
-        // TODO: this.GetNode<Label>("VelocityDebugInfo").Text = "Velocity: " + m_CurrentVelocity;
-
-        // DEBUG: Show the player's current movement speed factor
-        // TODO: this.GetNode<Label>("MovementSpeedFactorDebugInfo").Text = "Movement Speed Factor: " + m_CurrentMovementSpeedFactor;
-
-        // DEBUG: Information about the current state on the screen
-        this.GetNode<Label>("CurrentStateDebugInfo").Text = "Current State: " + m_CurrentState.GetType().Name;
-        // DEBUG: Show if the player is on the floor currently
-        var floorDebugLabel = this.GetNode<Label>("IsOnFloorDebugInfo");
-        if (this.IsOnFloor())
-        {
-            floorDebugLabel.AddThemeColorOverride("font_color", new Color(0, 1, 0));
-            floorDebugLabel.Text = "On Floor: True";
-        }
-        else
-        {
-            floorDebugLabel.AddThemeColorOverride("font_color", new Color(1, 0, 0));
-            floorDebugLabel.Text = "On Floor: False";
-        }
-
-        // Debug: Show the Player's Stats info
-        string statsInfo = "PLAYER STATS:\n";
-        foreach (var stat in m_MobStats.m_BaseStatTypeToCurrentValue)
-        {
-            statsInfo += stat.Key.ToString() + ": " + stat.Value + "\n";
-        }
-        foreach (var stat in m_MobStats.m_AttributeTypeToCurrentLevel)
-        {
-            statsInfo += stat.Key.ToString() + ": " + stat.Value + "\n";
-        }
-        foreach (var stat in m_MobStats.m_SpecialStatTypeToAmountFactor)
-        {
-            statsInfo += stat.Key.ToString() + ": " + stat.Value + "\n";
-        }
-        this.GetNode<Label>("StatsDebugInfo").Text = statsInfo;
     }
 }
