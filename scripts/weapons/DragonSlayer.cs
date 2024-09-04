@@ -7,7 +7,7 @@ public partial class DragonSlayer : Weapon
     {
         SetItemName("Dragon Slayer");
         SetItemSlotType(Item.ItemSlot.MainHand);
-        m_Stats.SetWeaponType(WeaponStats.WeaponType.Melee);
+        m_WeaponStats.SetWeaponType(WeaponType.Melee);
     }
 
     // Called when the node enters the scene tree for the first time.

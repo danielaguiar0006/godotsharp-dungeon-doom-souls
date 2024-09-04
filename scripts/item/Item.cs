@@ -50,6 +50,7 @@ public partial class Item : Node3D
     public bool m_IsConsumable { get; private set; } = false;
     // TODO: public Texture m_GuiIcon;
 
+
     // Called when a body enters the Area3D - Body is any PhysicsBody3D (CharacterBody3D, RigidBody3D, etc...)
     public void _OnPickupArea3DBodyEntered(Node3D body)
     {

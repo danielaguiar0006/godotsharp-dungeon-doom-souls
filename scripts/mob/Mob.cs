@@ -31,7 +31,7 @@ public partial class Mob : CharacterBody3D
     // TODO: Make an inventory class & object which handles storing items, equiping, and unequiping items (Basically an InvenotryManager):
 
     public Dictionary<Item.ItemSlot, Item> m_EquipedItems { get; private set; } = new Dictionary<Item.ItemSlot, Item>();
-    public MobStats m_Stats { get; private set; } = new MobStats();
+    public MobStats m_MobStats { get; private set; } = new MobStats();
 
 
     // moveSpeedFactor can be used for slower or faster movement (walking, running, etc...)
@@ -56,7 +56,7 @@ public partial class Mob : CharacterBody3D
     {
         if (applyStatMovementSpeedFactor)
         {
-            movementSpeedFactor *= m_Stats.GetSpecialStatAmountFactors()[SpecialStatType.MovementSpeedFactor];
+            movementSpeedFactor *= m_MobStats.m_SpecialStatTypeToAmountFactor[SpecialStatType.MovementSpeedFactor];
         }
 
         // Get the input direction and handle the movement/deceleration.
@@ -81,7 +81,7 @@ public partial class Mob : CharacterBody3D
     {
         if (applyStatMovementSpeedFactor)
         {
-            movementSpeedFactor *= m_Stats.GetSpecialStatAmountFactors()[SpecialStatType.MovementSpeedFactor];
+            movementSpeedFactor *= m_MobStats.m_SpecialStatTypeToAmountFactor[SpecialStatType.MovementSpeedFactor];
         }
 
         if (wishDirection != Vector3.Zero)
@@ -99,10 +99,10 @@ public partial class Mob : CharacterBody3D
     // TODO:
     public void TakeDamage(ref Damage damage)
     {
-        float currentHealth = m_Stats.GetCurrentBaseStatValues()[BaseStatType.Health];
+        float currentHealth = m_MobStats.m_BaseStatTypeToCurrentValue[BaseStatType.Health];
 
         // Apply damage resistance
-        var resistanceFactors = m_Stats.GetResistanceAmountFactors();
+        var resistanceFactors = m_MobStats.m_DamageTypeToResistanceAmountFactor;
         foreach (var damageTypeToDamageAmount in damage.m_DamageTable)
         {
             if (resistanceFactors.TryGetValue(damageTypeToDamageAmount.Key, out float resistanceFactor))
@@ -120,8 +120,8 @@ public partial class Mob : CharacterBody3D
         // TODO: Apply Special effects
 
         // Apply updated health
-        m_Stats.SetCurrentBaseStatValue(BaseStatType.Health, currentHealth);
-        GD.Print("Mob's Health: " + m_Stats.GetCurrentBaseStatValues()[BaseStatType.Health]);
+        m_MobStats.SetCurrentBaseStatValue(BaseStatType.Health, currentHealth);
+        GD.Print("Mob's Health: " + m_MobStats.m_BaseStatTypeToCurrentValue[BaseStatType.Health]);
 
         if (currentHealth <= 0.0f)
         {
@@ -145,17 +145,17 @@ public partial class Mob : CharacterBody3D
         }
 
         // Apply Attribute effects
-        var attributeLevels = m_Stats.GetCurrentAttributeLevels();
+        var attributeLevels = m_MobStats.m_AttributeTypeToCurrentLevel;
         foreach (var damageTypeToDamageAmount in damage.m_DamageTable)
         {
             if (damageTypeToDamageAmount.Key == DamageType.Physical)
             {
-                damage.m_DamageTable[DamageType.Physical] = damageTypeToDamageAmount.Value * (attributeLevels[AttributeType.Strength] * m_Stats.GetLevelEffectFactor());
+                damage.m_DamageTable[DamageType.Physical] = damageTypeToDamageAmount.Value * (attributeLevels[AttributeType.Strength] * m_MobStats.m_LevelEffectFactor);
             }
         }
 
         // Apply special effects
-        var specialStats = m_Stats.GetSpecialStatAmountFactors();
+        var specialStats = m_MobStats.m_SpecialStatTypeToAmountFactor;
         foreach (var damageTypeToDamageAmount in damage.m_DamageTable)
         {
             if (damageTypeToDamageAmount.Key == DamageType.Physical)
@@ -247,5 +247,5 @@ public partial class Mob : CharacterBody3D
     // NOTE: SetGravity() is not needed as it should be synced with the project settings
     public void SetInventoryItems(Item[] inventoryItems) { m_InventoryItems = inventoryItems; }
     public void SetEquipedItems(Dictionary<Item.ItemSlot, Item> equipedItems) { m_EquipedItems = equipedItems; }
-    public void SetStats(MobStats stats) { m_Stats = stats; }
+    public void SetStats(MobStats stats) { m_MobStats = stats; }
 }

@@ -4,40 +4,38 @@ using Game.ActionTypes;
 using Game.StatsManager;
 using Game.StateMachines;
 
-// NOTE: The reason for all the public variables is so that player data can be easily
-// read and modified in the individual states (i.e. IdleState, MoveState, etc...).
+
 public partial class Player : Mob
 {
     [ExportCategory("Movement")]
     // NOTE: both moveSpeed and moveSpeedFactor affect the speed of most movement related actions
     [Export]
-    public DodgeType m_DodgeType = DodgeType.Dash;
+    public DodgeType m_DodgeType { get; private set; } = DodgeType.Dash;
     [Export]
-    public float m_JumpVelocity = 4.0f;
+    public float m_JumpVelocity { get; private set; } = 4.0f;
 
     [ExportCategory("Camera")]
     [Export]
-    public float m_MouseSensitivity = 0.1f;
+    public float m_MouseSensitivity { get; private set; } = 0.1f;
     [Export]
-    public Node3D m_CameraPivot;
+    public Node3D m_CameraPivot { get; private set; }
     [Export]
-    public Camera3D m_Camera;
+    public Camera3D m_Camera { get; private set; }
     [Export]
-    public RayCast3D m_Raycast;
-
-    private PlayerState m_CurrentState = null;
+    public RayCast3D m_Raycast { get; private set; }
+    [Export]
+    public PlayerState m_CurrentState { get; private set; } = null;
 
     // Aiming/Camera input
-    public float m_YawInput = 0.0f;
-    public float m_PitchInput = 0.0f;
-    public float m_PitchLowerLimit = 0.0f;
-    public float m_PitchUpperLimit = 0.0f;
-
+    private float m_YawInput = 0.0f;
+    private float m_PitchInput = 0.0f;
+    private float m_PitchLowerLimit = 0.0f;
+    private float m_PitchUpperLimit = 0.0f;
 
     // Useful values
+    private bool m_ShowDebugInfo = false;
     //private Vector3 m_CurrentVelocity = Vector3.Zero;
     //private float m_CurrentMovementSpeedFactor = 0.0f;
-    private bool m_ShowDebugInfo = false;
 
 
     public override void _EnterTree()
@@ -103,18 +101,18 @@ public partial class Player : Mob
         {
             ShowDebugInfo();
 
-            float movementSpeedFactor = m_Stats.GetSpecialStatAmountFactors()[SpecialStatType.MovementSpeedFactor];
+            float movementSpeedFactor = m_MobStats.m_SpecialStatTypeToAmountFactor[SpecialStatType.MovementSpeedFactor];
             if (Input.IsPhysicalKeyPressed(Key.Up))
             {
-                m_Stats.SetSpecialStatAmountFactor(SpecialStatType.MovementSpeedFactor, movementSpeedFactor + 0.001f);
+                m_MobStats.SetSpecialStatAmountFactor(SpecialStatType.MovementSpeedFactor, movementSpeedFactor + 0.001f);
             }
             else if (Input.IsPhysicalKeyPressed(Key.Down))
             {
-                m_Stats.SetSpecialStatAmountFactor(SpecialStatType.MovementSpeedFactor, movementSpeedFactor - 0.001f);
+                m_MobStats.SetSpecialStatAmountFactor(SpecialStatType.MovementSpeedFactor, movementSpeedFactor - 0.001f);
             }
             else if (Input.IsPhysicalKeyPressed(Key.Left))
             {
-                m_Stats.SetCurrentBaseStatValue(BaseStatType.Health, m_Stats.GetCurrentBaseStatValues()[BaseStatType.Health] - 1);
+                m_MobStats.SetCurrentBaseStatValue(BaseStatType.Health, m_MobStats.m_BaseStatTypeToCurrentValue[BaseStatType.Health] - 1);
             }
         }
         else
@@ -206,15 +204,15 @@ public partial class Player : Mob
 
         // Debug: Show the Player's Stats info
         string statsInfo = "PLAYER STATS:\n";
-        foreach (var stat in m_Stats.GetCurrentBaseStatValues())
+        foreach (var stat in m_MobStats.m_BaseStatTypeToCurrentValue)
         {
             statsInfo += stat.Key.ToString() + ": " + stat.Value + "\n";
         }
-        foreach (var stat in m_Stats.GetCurrentAttributeLevels())
+        foreach (var stat in m_MobStats.m_AttributeTypeToCurrentLevel)
         {
             statsInfo += stat.Key.ToString() + ": " + stat.Value + "\n";
         }
-        foreach (var stat in m_Stats.GetSpecialStatAmountFactors())
+        foreach (var stat in m_MobStats.m_SpecialStatTypeToAmountFactor)
         {
             statsInfo += stat.Key.ToString() + ": " + stat.Value + "\n";
         }

@@ -1,11 +1,17 @@
 using Godot;
 using Game.StatsManager;
+using Game.DamageSystem;
 
 public partial class Weapon : Item
 {
-    protected WeaponStats m_Stats = new WeaponStats();
-    protected Area3D m_HitBox;
-    protected Animation m_Animation;
+    public WeaponStats m_WeaponStats = new WeaponStats();
+    public Area3D m_HitBox { get; private set; }
+    public Damage m_LightAttackDamage { get; private set; }
+    public Damage m_HeavyAttackDamage { get; private set; }
+    public Damage m_SpecialAttackDamage { get; private set; }
+    public Animation m_LightAttackAnimation { get; private set; }
+    public Animation m_HeavyAttackAnimatio { get; private set; }
+    public Animation m_SpecialAttackAnimation { get; private set; }
 
 
     public Weapon()
@@ -40,9 +46,20 @@ public partial class Weapon : Item
     {
         //TODO: attackstate length
     }
-    public virtual void AttackSpeacialState()
+    public virtual void AttackSpecialState()
     {
         //TODO: attackstate length
     }
+
+    // -------------------------------------------
+    // Setters
+    // -------------------------------------------
+    public void SetHitBox(Area3D hitBox) { m_HitBox = hitBox; }
+    public void SetLightAttackDamage(Damage lightAttackDamage) { m_LightAttackDamage = lightAttackDamage; }
+    public void SetHeavyAttackDamage(Damage heavyAttackDamage) { m_HeavyAttackDamage = heavyAttackDamage; }
+    public void SetSpecialAttackDamage(Damage specialAttackDamage) { m_SpecialAttackDamage = specialAttackDamage; }
+    public void SetLightAttackAnimation(Animation lightAttackAnimation) { m_LightAttackAnimation = lightAttackAnimation; }
+    public void SetHeavyAttackAnimation(Animation heavyAttackAnimation) { m_HeavyAttackAnimatio = heavyAttackAnimation; }
+    public void SetSpecialAttackAnimation(Animation specialAttackAnimation) { m_SpecialAttackAnimation = specialAttackAnimation; }
 }
 

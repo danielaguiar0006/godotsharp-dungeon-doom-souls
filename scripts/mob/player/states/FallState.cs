@@ -43,7 +43,7 @@ public partial class FallState : PlayerState
 
     public override PlayerState PhysicsProcess(Player player, ref Vector3 velocity, double delta)
     {
-        float fallSpeedMovementFactor = Input.IsActionPressed(s_MoveSprint) ? player.m_Stats.GetSpecialStatAmountFactors()[SpecialStatType.SprintSpeedFactor] : 1.0f;
+        float fallSpeedMovementFactor = Input.IsActionPressed(s_MoveSprint) ? player.m_MobStats.m_SpecialStatTypeToAmountFactor[SpecialStatType.SprintSpeedFactor] : 1.0f;
         player.ApplyMovementInputToVector(ref velocity, fallSpeedMovementFactor);
 
         // Transition to the idle state if the player is not moving

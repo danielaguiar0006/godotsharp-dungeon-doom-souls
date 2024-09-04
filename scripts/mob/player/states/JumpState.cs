@@ -57,7 +57,7 @@ public partial class JumpState : PlayerState
     {
         if (isJumping)
         {
-            float jumpSpeedMovementFactor = Input.IsActionPressed(s_MoveSprint) ? player.m_Stats.GetSpecialStatAmountFactors()[SpecialStatType.SprintSpeedFactor] : 1.0f;
+            float jumpSpeedMovementFactor = Input.IsActionPressed(s_MoveSprint) ? player.m_MobStats.m_SpecialStatTypeToAmountFactor[SpecialStatType.SprintSpeedFactor] : 1.0f;
             player.ApplyMovementInputToVector(ref velocity, jumpSpeedMovementFactor);
 
             if (appliedJumpVelocityTimeSec > 0.0f)

@@ -52,7 +52,7 @@ public partial class SprintState : PlayerState
 
     public override PlayerState PhysicsProcess(Player player, ref Vector3 velocity, double delta)
     {
-        player.ApplyMovementInputToVector(ref velocity, player.m_Stats.GetSpecialStatAmountFactors()[SpecialStatType.SprintSpeedFactor]);
+        player.ApplyMovementInputToVector(ref velocity, player.m_MobStats.m_SpecialStatTypeToAmountFactor[SpecialStatType.SprintSpeedFactor]);
 
         // Transition to the idle state if the player is not moving
         if (velocity.Length() == 0)
