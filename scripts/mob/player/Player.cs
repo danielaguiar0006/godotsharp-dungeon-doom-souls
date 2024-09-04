@@ -1,7 +1,6 @@
 using Godot;
 using static InputActions;
 using Game.ActionTypes;
-using Game.StatsManager;
 using Game.StateMachines;
 
 
@@ -10,13 +9,11 @@ public partial class Player : Mob
     [ExportCategory("Movement")]
     // NOTE: both moveSpeed and moveSpeedFactor affect the speed of most movement related actions
     [Export]
-    public DodgeType m_DodgeType { get; private set; } = DodgeType.Dash;
-    [Export]
-    public float m_JumpVelocity { get; private set; } = 4.0f;
+    public DodgeType m_DodgeType { get; set; } = DodgeType.Dash;
 
     [ExportCategory("Camera")]
     [Export]
-    public float m_MouseSensitivity { get; private set; } = 0.1f;
+    public float m_MouseSensitivity = 0.1f;
     [Export]
     public Node3D m_CameraPivot { get; private set; }
     [Export]
@@ -24,7 +21,7 @@ public partial class Player : Mob
     [Export]
     public RayCast3D m_Raycast { get; private set; }
     [Export]
-    public PlayerState m_CurrentState { get; private set; } = null;
+    public PlayerState m_CurrentPlayerState { get; private set; } = null;
 
     // Aiming/Camera input
     private float m_YawInput = 0.0f;
@@ -57,8 +54,7 @@ public partial class Player : Mob
         m_Camera.Current = true;
 
         // Set the players initial state here
-        m_CurrentState = new IdleState();
-        m_CurrentState.OnEnterState(this);
+        TransitionToState(new IdleState());
     }
 
     public override void _UnhandledInput(InputEvent @event)
@@ -66,37 +62,22 @@ public partial class Player : Mob
         AimCamera(@event);
 
         // NOTE: newState is null if the state does not change, otherwise it is the new state
-        PlayerState newState = m_CurrentState.HandleInput(this, @event);
-        if (newState != null)
-        {
-            m_CurrentState.OnExitState(this);
-            m_CurrentState = newState;
-            m_CurrentState.OnEnterState(this);
-        }
+        PlayerState newState = m_CurrentPlayerState.HandleInput(this, @event);
+        TransitionToState(newState);
     }
 
     public override void _UnhandledKeyInput(InputEvent @event)
     {
         // NOTE: newState is null if the state does not change, otherwise it is the new state
-        PlayerState newState = m_CurrentState.HandleKeyboardInput(this, @event);
-        if (newState != null)
-        {
-            m_CurrentState.OnExitState(this);
-            m_CurrentState = newState;
-            m_CurrentState.OnEnterState(this);
-        }
+        PlayerState newState = m_CurrentPlayerState.HandleKeyboardInput(this, @event);
+        TransitionToState(newState);
 
     }
 
     public override void _Process(double delta)
     {
-        PlayerState newState = m_CurrentState.Process(this, delta);
-        if (newState != null)
-        {
-            m_CurrentState.OnExitState(this);
-            m_CurrentState = newState;
-            m_CurrentState.OnEnterState(this);
-        }
+        PlayerState newState = m_CurrentPlayerState.Process(this, delta);
+        TransitionToState(newState);
     }
 
     public override void _PhysicsProcess(double delta)
@@ -105,17 +86,29 @@ public partial class Player : Mob
         // performance and work with the new velocity variable instead
         Vector3 velocity = this.Velocity;
 
-        PlayerState newState = m_CurrentState.PhysicsProcess(this, ref velocity, delta);
-        if (newState != null)
-        {
-            m_CurrentState.OnExitState(this);
-            m_CurrentState = newState;
-            m_CurrentState.OnEnterState(this);
-        }
+        PlayerState newState = m_CurrentPlayerState.PhysicsProcess(this, ref velocity, delta);
+        TransitionToState(newState);
 
         // Apply gravity and movement
         ApplyGravityToVector(ref velocity, delta);
         ApplyMobMovement(ref velocity);
+    }
+
+    // Change the player's state
+    public void TransitionToState(PlayerState newState)
+    {
+        if (newState != null)
+        {
+            if (m_CurrentPlayerState != null) { m_CurrentPlayerState.OnExitState(this); } // Exit current state 
+            m_CurrentPlayerState = newState;        // Set the new state
+            PlayerState nextState = m_CurrentPlayerState.OnEnterState(this); // Enter the new state
+
+            // If the OnEnterState of the new state returns another state, transition again
+            if (nextState != null)
+            {
+                TransitionToState(nextState);
+            }
+        }
     }
 
     // Helper funciton to aim the camera through mouse/controller input

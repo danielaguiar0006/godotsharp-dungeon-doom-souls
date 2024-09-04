@@ -18,6 +18,7 @@ public partial class AttackLightState : PlayerState
         // do more things
         //
         // call the weapons OnAttackLightStateEnter() or somethings
+        return new IdleState();
         return null;
     }
 

@@ -1,8 +1,9 @@
 using Godot;
+using System.Collections.Generic;
 using static InputActions;
 using Game.StatsManager;
 using Game.DamageSystem;
-using System.Collections.Generic;
+using Game.StateMachines;
 
 public partial class Mob : CharacterBody3D
 {
@@ -23,13 +24,17 @@ public partial class Mob : CharacterBody3D
     [Export]
     public float m_MovementSpeed { get; private set; } = 5.0f;
     [Export]
+    public MobState m_CurrentMobState { get; protected set; } = null;
+    [Export]
     public Vector3 m_MovementDirection { get; private set; } = Vector3.Zero; // Where the mob is moving towards
-    // Get the gravity from the project settings to be synced with RigidBody nodes
-    public float m_Gravity { get; private set; } = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
+    [Export]
+    public float m_JumpVelocity = 4.0f;
     [Export]
     public Item[] m_InventoryItems { get; private set; }
     // TODO: Make an inventory class & object which handles storing items, equiping, and unequiping items (Basically an InvenotryManager):
 
+    // Get the gravity from the project settings to be synced with RigidBody nodes
+    public float m_Gravity { get; private set; } = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
     public Dictionary<Item.ItemSlot, Item> m_EquipedItems { get; private set; } = new Dictionary<Item.ItemSlot, Item>();
     public MobStats m_MobStats { get; private set; } = new MobStats();
 
@@ -234,6 +239,23 @@ public partial class Mob : CharacterBody3D
             return;
         }
         // TODO: Add item to inventory
+    }
+
+    // Change the mob's state
+    public void TransitionToState(MobState newState)
+    {
+        if (newState != null)
+        {
+            if (m_CurrentMobState != null) { m_CurrentMobState.OnExitState(this); } // Exit current state 
+            m_CurrentMobState = newState;        // Set the new state
+            MobState nextState = m_CurrentMobState.OnEnterState(this); // Enter the new state
+
+            // If the OnEnterState of the new state returns another state, transition again
+            if (nextState != null)
+            {
+                TransitionToState(nextState);
+            }
+        }
     }
 
     // -------------------------------------------

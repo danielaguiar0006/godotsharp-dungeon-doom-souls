@@ -47,7 +47,7 @@ public partial class DebugOverlay : CanvasLayer
         m_StatsDebugLabel.Visible = true;
 
         // Information about the current state on the screen
-        m_CurrentStateDebugLabel.Text = "Current State: " + m_Owner.m_CurrentState.GetType().Name;
+        m_CurrentStateDebugLabel.Text = "Current State: " + m_Owner.m_CurrentPlayerState.GetType().Name;
 
         UpdateFloorDebugLabel();
         m_StatsDebugLabel.Text = GetPlayerStatsInfo();
