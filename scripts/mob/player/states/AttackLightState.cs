@@ -19,6 +19,7 @@ public partial class AttackLightState : PlayerState
         //
         // call the weapons OnAttackLightStateEnter() or somethings
         return new IdleState();
+        // BUG: Attacking while jumping causes the player to return to the sprint state instead of the jumping state
         return null;
     }
 

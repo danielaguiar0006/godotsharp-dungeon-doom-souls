@@ -20,7 +20,7 @@ public partial class Mob : CharacterBody3D
     [Export]
     public bool m_IsAlive { get; private set; } = true;
     [Export]
-    public bool m_IsHostile { get; private set; } = true;
+    public bool m_IsHostile { get; private set; } = true; // TODO: think about what you want to have private set and not...
     [Export]
     public float m_MovementSpeed { get; private set; } = 5.0f;
     [Export]

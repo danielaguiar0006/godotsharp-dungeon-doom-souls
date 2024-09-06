@@ -1,5 +1,4 @@
 using Godot;
-using static InputActions;
 using Game.ActionTypes;
 using Game.StateMachines;
 
