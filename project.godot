@@ -15,10 +15,6 @@ run/main_scene="res://scenes/boss_level.tscn"
 config/features=PackedStringArray("4.3", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
-[debug]
-
-settings/stdout/print_fps=true
-
 [display]
 
 window/size/mode=2

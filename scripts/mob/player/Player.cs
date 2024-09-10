@@ -32,6 +32,13 @@ public partial class Player : Mob
     //private Vector3 m_CurrentVelocity = Vector3.Zero;
     //private float m_CurrentMovementSpeedFactor = 0.0f;
 
+    public Player()
+    {
+        SetIsAlive(true);
+        SetMobType(MobType.Player);
+
+        // TODO: set some sort of id to tell between clients/players
+    }
 
     public override void _EnterTree()
     {

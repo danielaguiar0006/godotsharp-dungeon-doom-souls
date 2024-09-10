@@ -9,10 +9,10 @@ public partial class Mob : CharacterBody3D
 {
     public enum MobType
     {
-        Player,
-        NPC,
         Monster,
-        Boss
+        NPC,
+        Boss,
+        Player
     }
 
     [Export]
