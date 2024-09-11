@@ -16,9 +16,9 @@ public partial class Mob : CharacterBody3D
     }
 
     [Export]
-    public MobType m_MobType { get; private set; }
+    public StringName m_Name = "Mob";
     [Export]
-    public bool m_IsAlive { get; private set; } = true;
+    public MobType m_MobType { get; private set; }
     [Export]
     public bool m_IsHostile { get; private set; } = true; // TODO: think about what you want to have private set and not...
     [Export]
@@ -139,15 +139,15 @@ public partial class Mob : CharacterBody3D
     // NOTE: We pass a ref to damageTable so that the weapon can pass different damage values to the mob depending on the type of attack (light, heavy, special, etc...)
     public void Attack(Damage damage, Mob target)
     {
-        if (!m_IsAlive)
-        {
-            return;
-        }
-
-        if (target == null || !target.m_IsAlive)
-        {
-            return;
-        }
+        // if (!m_IsAlive)
+        // {
+        //     return;
+        // }
+        //
+        // if (target == null || !target.m_IsAlive)
+        // {
+        //     return;
+        // }
 
         // Apply Attribute effects
         var attributeLevels = m_MobStats.m_AttributeTypeToCurrentLevel;
@@ -178,10 +178,10 @@ public partial class Mob : CharacterBody3D
     }
 
     // TODO:
-    public virtual void Die()
+    public void Die()
     {
-        m_IsAlive = false;
-        GD.Print("Mob has died");
+        GD.Print(this.m_Name + " has died");
+        GameManager.Instance.DespawnMob(this);
     }
 
     // TODO:
@@ -262,7 +262,6 @@ public partial class Mob : CharacterBody3D
     // Setters
     // -------------------------------------------
     public void SetMobType(MobType mobType) { m_MobType = mobType; }
-    public void SetIsAlive(bool isAlive) { m_IsAlive = isAlive; }
     public void SetIsHostile(bool isHostile) { m_IsHostile = isHostile; }
     public void SetMovementSpeed(float movementSpeed) { m_MovementSpeed = movementSpeed; }
     public void SetMovementDirection(Vector3 movementDirection) { m_MovementDirection = movementDirection; }

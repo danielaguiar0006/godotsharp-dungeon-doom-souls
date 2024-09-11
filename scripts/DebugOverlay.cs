@@ -115,10 +115,12 @@ public partial class DebugOverlay : CanvasLayer
         }
         else if (Input.IsPhysicalKeyPressed(Key.Left))
         {
-            m_Owner.m_MobStats.SetCurrentBaseStatValue(
-                    BaseStatType.Health,
-                    m_Owner.m_MobStats.m_BaseStatTypeToCurrentValue
-                    [BaseStatType.Health] - HEALTH_CHANGE_AMOUNT);
+            // m_Owner.m_MobStats.SetCurrentBaseStatValue(
+            //         BaseStatType.Health,
+            //         m_Owner.m_MobStats.m_BaseStatTypeToCurrentValue
+            //         [BaseStatType.Health] - HEALTH_CHANGE_AMOUNT);
+
+            m_Owner.Die();
         }
     }
 }

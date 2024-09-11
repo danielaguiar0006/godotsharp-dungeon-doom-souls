@@ -7,7 +7,9 @@ using Game.Networking;
 public partial class GameManager : Node
 {
     [Export]
-    bool m_IsOnline = true;
+    public bool m_IsOnline { get; private set; } = true;
+    [Export]
+    public ushort m_CurrentLevel = 0;
     [Export]
     protected Node3D m_Level;
 
@@ -17,6 +19,8 @@ public partial class GameManager : Node
     public List<Monster> m_ActiveMonsters { get; private set; } = new List<Monster>();
     public List<NPC> m_ActiveNPCs { get; private set; } = new List<NPC>();
     public List<Boss> m_ActiveBosses { get; private set; } = new List<Boss>();
+
+    private PackedScene m_PlayerScene;
 
     private static GameManager _instance;
 
@@ -43,11 +47,22 @@ public partial class GameManager : Node
             QueueFree();
             return;
         }
-
         _instance = this;
         GD.Print("GameManager Ready");
 
-        // TODO: check if isOnline and spawn in the network manager and in the network manager check if a/the server is online.
+        // NOTE: Must load resources before calling StartGame()
+        m_PlayerScene = ResourceLoader.Load<PackedScene>("res://scenes/prefabs/player.tscn");
+
+        if (m_IsOnline)
+        {
+            PackedScene networkManagerScene = ResourceLoader.Load<PackedScene>("res://scenes/network_manager.tscn");
+            AddChild(networkManagerScene.Instantiate<NetworkManager>());
+        }
+
+        if (m_CurrentLevel == 0)
+        {
+            StartGame();
+        }
     }
 
     public override void _Process(double delta)
@@ -59,36 +74,62 @@ public partial class GameManager : Node
         if (m_IsOnline) { NetworkManager.ServerUpdate(delta); }
     }
 
-    public void spawnMob(Mob mob, Vector3 position)
+    public void StartGame()
+    {
+        SpawnMob(Mob.MobType.Player, new Vector3(0, 0, 0));
+    }
+
+    public void SpawnMob(Mob.MobType mobType, Vector3 position)
+    {
+        switch (mobType)
+        {
+            case Mob.MobType.Player:
+                Player playerInstance = m_PlayerScene.Instantiate<Player>();
+                m_ActivePlayers.Add(playerInstance);
+                m_Level.AddChild(playerInstance);
+                playerInstance.Position = position;
+                GD.Print("Spawning Player");
+                break;
+            case Mob.MobType.Monster:
+                // TODO: spawn a monster
+                GD.Print("Spawning Monster");
+                break;
+            case Mob.MobType.NPC:
+                // TODO: spawn a NPC
+                GD.Print("Spawning NPC");
+                break;
+            case Mob.MobType.Boss:
+                // TODO: spawn a Boss
+                GD.Print("Spawning Boss");
+                break;
+        }
+    }
+
+    public void DespawnMob(Mob mob)
     {
         if (mob == null)
         {
-            GD.PrintErr("Unable to Spawn Mob: Mob is null");
+            GD.PrintErr("Unable to Despawn Mob: Mob is null");
             return;
         }
 
-        // add the mob to the active mobs list
-        if (mob.m_MobType == Mob.MobType.Player) { m_ActivePlayers.Add((Player)mob); }
-        else if (mob.m_MobType == Mob.MobType.Monster) { m_ActiveMonsters.Add((Monster)mob); }
-        else if (mob.m_MobType == Mob.MobType.NPC) { m_ActiveNPCs.Add((NPC)mob); }
-        else if (mob.m_MobType == Mob.MobType.Boss) { m_ActiveBosses.Add((Boss)mob); }
+        switch (mob.m_MobType)
+        {
+            case Mob.MobType.Player:
+                m_ActivePlayers.Remove((Player)mob);
+                break;
+            case Mob.MobType.Monster:
+                m_ActiveMonsters.Remove((Monster)mob);
+                break;
+            case Mob.MobType.NPC:
+                m_ActiveNPCs.Remove((NPC)mob);
+                break;
+            case Mob.MobType.Boss:
+                m_ActiveBosses.Remove((Boss)mob);
+                break;
+        }
 
-        // spawn the mob
-        mob.GlobalTransform = new Transform3D(new Basis(), position);
-        m_Level.AddChild(mob);
-    }
-
-    public void despawnMob(Mob mob)
-    {
-        Debug.Assert(mob != null, "Unable to Despawn Mob: Mob is null");
-
-        // remove the mob from the active mobs list
-        if (mob.m_MobType == Mob.MobType.Player) { m_ActivePlayers.Remove((Player)mob); }
-        else if (mob.m_MobType == Mob.MobType.Monster) { m_ActiveMonsters.Remove((Monster)mob); }
-        else if (mob.m_MobType == Mob.MobType.NPC) { m_ActiveNPCs.Remove((NPC)mob); }
-        else if (mob.m_MobType == Mob.MobType.Boss) { m_ActiveBosses.Remove((Boss)mob); }
-
-        // despawn the mob
+        // remove the mob from the level/scene
         m_Level.RemoveChild(mob);
     }
 }

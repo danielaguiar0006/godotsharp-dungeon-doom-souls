@@ -1,6 +1,7 @@
 using Godot;
 using Game.ActionTypes;
 using Game.StateMachines;
+using System.Net.Sockets;
 
 
 public partial class Player : Mob
@@ -22,6 +23,9 @@ public partial class Player : Mob
     [Export]
     public PlayerState m_CurrentPlayerState { get; private set; } = null;
 
+#nullable enable
+    private UdpClient? m_UdpClient;
+
     // Aiming/Camera input
     private float m_YawInput = 0.0f;
     private float m_PitchInput = 0.0f;
@@ -34,7 +38,7 @@ public partial class Player : Mob
 
     public Player()
     {
-        SetIsAlive(true);
+        m_Name = "Player" + GameManager.Instance.m_ActivePlayers.Count.ToString();
         SetMobType(MobType.Player);
 
         // TODO: set some sort of id to tell between clients/players
@@ -46,6 +50,8 @@ public partial class Player : Mob
 
     public override void _Ready()
     {
+        if (GameManager.Instance.m_IsOnline) { m_UdpClient = new UdpClient(); }
+
         // For more accurate mouse input
         Input.UseAccumulatedInput = false;
 

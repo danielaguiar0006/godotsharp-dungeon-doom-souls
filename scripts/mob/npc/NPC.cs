@@ -8,7 +8,6 @@ public partial class NPC : Mob
     NPC()
     {
         SetIsHostile(false);
-        SetIsAlive(true);
         SetMobType(MobType.NPC);
     }
 

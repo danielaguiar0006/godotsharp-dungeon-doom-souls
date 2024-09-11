@@ -8,6 +8,8 @@ namespace Game.Networking
 {
     public partial class NetworkManager : Node
     {
+        private IPEndPoint m_RelayServerEndpoint;
+
         private static NetworkManager _instance;
 
         public static NetworkManager Instance
@@ -36,6 +38,19 @@ namespace Game.Networking
 
             _instance = this;
             GD.Print("NetworkManager Ready");
+
+            // TODO: check for server online if so connect to it, else try and start a server
+            //
+            string serverIp = System.Environment.GetEnvironmentVariable("SERVER_IP");
+            string serverPortString = System.Environment.GetEnvironmentVariable("SERVER_PORT");
+
+            if (string.IsNullOrEmpty(serverIp) || string.IsNullOrEmpty(serverPortString) || !int.TryParse(serverPortString, out int serverPort))
+            {
+                GD.Print("SERVER_IP and SERVER_PORT environment variables must be set or Invalid.");
+                return;
+            }
+
+            m_RelayServerEndpoint = new IPEndPoint(IPAddress.Parse(serverIp), serverPort);
         }
 
         public static void ServerUpdate(double delta)

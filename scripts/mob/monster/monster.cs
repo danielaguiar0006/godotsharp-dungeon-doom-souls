@@ -8,7 +8,6 @@ public partial class Monster : Mob
     Monster()
     {
         SetIsHostile(true);
-        SetIsAlive(true);
         SetMobType(MobType.Monster);
     }
 

@@ -7,7 +7,6 @@ public partial class Boss : Mob
 {
     Boss()
     {
-        SetIsAlive(true);
         SetIsHostile(true);
         SetMobType(MobType.Boss);
     }
@@ -21,5 +20,4 @@ public partial class Boss : Mob
     public override void _Process(double delta)
     {
     }
-
 }
