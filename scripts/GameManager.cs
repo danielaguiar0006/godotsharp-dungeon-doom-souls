@@ -52,6 +52,7 @@ public partial class GameManager : Node
 
         // NOTE: Must load resources before calling StartGame()
         m_PlayerScene = ResourceLoader.Load<PackedScene>("res://scenes/prefabs/player.tscn");
+        SpawnMob(Mob.MobType.Player, new Vector3(0, 0, 0));
 
         if (m_IsOnline)
         {
@@ -65,10 +66,6 @@ public partial class GameManager : Node
         }
     }
 
-    public override void _Process(double delta)
-    {
-    }
-
     public override void _PhysicsProcess(double delta)
     {
         if (m_IsOnline) { NetworkManager.ServerUpdate(delta); }
@@ -76,7 +73,6 @@ public partial class GameManager : Node
 
     public void StartGame()
     {
-        SpawnMob(Mob.MobType.Player, new Vector3(0, 0, 0));
     }
 
     public void SpawnMob(Mob.MobType mobType, Vector3 position)

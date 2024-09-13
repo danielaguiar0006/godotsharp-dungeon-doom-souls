@@ -3,7 +3,6 @@ using Game.ActionTypes;
 using Game.StateMachines;
 using System.Net.Sockets;
 
-
 public partial class Player : Mob
 {
     [ExportCategory("Movement")]
@@ -24,7 +23,8 @@ public partial class Player : Mob
     public PlayerState m_CurrentPlayerState { get; private set; } = null;
 
 #nullable enable
-    private UdpClient? m_UdpClient;
+    public UdpClient? m_UdpClient;
+    public byte? m_ClientId { get; private set; }
 
     // Aiming/Camera input
     private float m_YawInput = 0.0f;
@@ -38,7 +38,7 @@ public partial class Player : Mob
 
     public Player()
     {
-        m_Name = "Player" + GameManager.Instance.m_ActivePlayers.Count.ToString();
+        m_Name = "Player";
         SetMobType(MobType.Player);
 
         // TODO: set some sort of id to tell between clients/players
@@ -151,4 +151,6 @@ public partial class Player : Mob
         cameraRotation.X = Mathf.Clamp(cameraRotation.X, m_PitchLowerLimit, m_PitchUpperLimit);
         m_CameraPivot.Rotation = cameraRotation;
     }
+
+    public void SetClientId(byte clientId) { m_ClientId = clientId; }
 }

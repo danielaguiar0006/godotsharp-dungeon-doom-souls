@@ -3,7 +3,7 @@ using System;
 
 namespace Game.Networking
 {
-    public class Packet
+    public struct Packet
     {
         public PacketType m_PacketType;
 
@@ -18,14 +18,15 @@ namespace Game.Networking
             // Other general categories
         }
 
-        // public enum GamePacketType
-        // {
-        //     Start,
-        //     End,
-        //     Over,
-        //     State,
-        //     ServerUpdate,
-        //     // Other game-specific actions
-        // }
+        public enum GamePacketType
+        {
+            PlayerJoin
+            //Start,
+            //End,
+            //Over,
+            //State,
+            //ServerUpdate,
+            // Other game-specific actions
+        }
     }
 }
