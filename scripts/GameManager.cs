@@ -68,7 +68,7 @@ public partial class GameManager : Node
 
     public override void _PhysicsProcess(double delta)
     {
-        if (m_IsOnline) { NetworkManager.ServerUpdate(delta); }
+        //if (m_IsOnline) { NetworkManager.ServerUpdate(delta); }
     }
 
     public void StartGame()
