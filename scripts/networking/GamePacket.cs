@@ -28,6 +28,7 @@ namespace Game.Networking
         }
 
         // Serialize the packet data into a byte array
+        // NOTE: Make sure to call PrefixWithProtocolID() before sending the packet
         public override void Write(BinaryWriter writer)
         {
             writer.Write((byte)m_PacketType);
