@@ -30,7 +30,6 @@ namespace Game.Networking
         // Serialize the packet data into a byte array
         public override void Write(BinaryWriter writer)
         {
-            PrefixProtocolID(writer);
             writer.Write((byte)m_PacketType);
             writer.Write((byte)m_OpCode);
             writer.Write(m_Data.Length);

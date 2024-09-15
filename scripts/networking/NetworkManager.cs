@@ -69,15 +69,16 @@ namespace Game.Networking
             _ = ConnectToServer();
         }
 
-        private async Task SendPacket(UdpClient localPlayerClient, Packet packet)
+        private async Task SendPacket(UdpClient localClient, Packet packet)
         {
             using (MemoryStream memoryStream = new MemoryStream())
             {
                 using (BinaryWriter writer = new BinaryWriter(memoryStream))
                 {
+                    packet.PrefixWithProtocolID(writer, NetworkManager.PROTOCOL_ID);
                     packet.Write(writer);
                     byte[] serializedPacketData = memoryStream.ToArray();
-                    await m_LocalPlayerClient.SendAsync(serializedPacketData, serializedPacketData.Length);
+                    await localClient.SendAsync(serializedPacketData, serializedPacketData.Length);
                 }
             }
         }
