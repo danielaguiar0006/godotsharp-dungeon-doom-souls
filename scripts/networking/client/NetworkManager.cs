@@ -89,16 +89,15 @@ namespace Game.Networking
                 // receive the packet from the server
                 UdpReceiveResult receiveResult = await m_LocalPlayerClient.ReceiveAsync();
                 Packet recievedPacket = PacketManager.GetPacketFromData(receiveResult.Buffer, PROTOCOL_ID); // NOTE: This can return null!
-
                 if (recievedPacket == null || recievedPacket.m_PacketType != Packet.PacketType.GamePacket)
                 {
                     GD.PrintErr("[ERROR] Failed to connect to server");
                     return;
                 }
 
-                // assign the client id to the player
                 m_LocalPlayer.SetClientId(recievedPacket?.m_Data[0]); // TODO: this should probably be a guuid or something...
-                String serverMessage = recievedPacket.m_Data[1..].ToString();
+                String serverMessage = System.Text.Encoding.UTF8.GetString(recievedPacket.m_Data[1..]);
+
                 GD.Print("[INFO] Succesfully connected to server, Client ID: " + m_LocalPlayer.m_ClientId);
                 GD.Print(serverMessage);
 
