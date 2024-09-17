@@ -26,10 +26,16 @@ Dungeon Doom Souls combines dungeon crawling and challenging combat available as
 
 ### Installation
 
-1. **Clone the Repository**
+1. **Clone the Repositories**
 
+   Make sure to place them beside each other in the same folder:
    ```bash
    git clone https://github.com/danielaguiar0006/godotsharp-dungeon-doom-souls.git
+   ```
+
+   Then, clone the dds-shared-lib repository:
+   ```bash
+   git clone https://github.com/danielaguiar0006/dds-shared-lib.git
    ```
 
 2. **Open the Project in Godot**
