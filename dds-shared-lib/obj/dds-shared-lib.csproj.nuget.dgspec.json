@@ -1,0 +1,61 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/reign/dev/work/godotsharp-dungeon-doom-souls/scripts/networking/dds-shared-lib/dds-shared-lib/dds-shared-lib.csproj": {}
+  },
+  "projects": {
+    "/home/reign/dev/work/godotsharp-dungeon-doom-souls/scripts/networking/dds-shared-lib/dds-shared-lib/dds-shared-lib.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/reign/dev/work/godotsharp-dungeon-doom-souls/scripts/networking/dds-shared-lib/dds-shared-lib/dds-shared-lib.csproj",
+        "projectName": "dds-shared-lib",
+        "projectPath": "/home/reign/dev/work/godotsharp-dungeon-doom-souls/scripts/networking/dds-shared-lib/dds-shared-lib/dds-shared-lib.csproj",
+        "packagesPath": "/home/reign/.nuget/packages/",
+        "outputPath": "/home/reign/dev/work/godotsharp-dungeon-doom-souls/scripts/networking/dds-shared-lib/dds-shared-lib/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/reign/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.108/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
