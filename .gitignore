@@ -16,5 +16,3 @@ mono_crash.*.json
 
 # Server code - This is its own repo: "UdpRelayServer"
 scripts/networking/UdpRelayServer/
-# Shared code - This is its own repo: "dds-shared-lib"
-scripts/networking/dds-shared-lib/
