@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.IO;
 using System.Threading.Tasks;
+using dds_shared_lib;
 
 
 namespace Game.Networking
@@ -69,56 +70,6 @@ namespace Game.Networking
             _ = ConnectToServer();
         }
 
-        private async Task SendPacket(UdpClient localClient, Packet packet)
-        {
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                using (BinaryWriter writer = new BinaryWriter(memoryStream))
-                {
-                    packet.PrefixWithProtocolID(writer, NetworkManager.PROTOCOL_ID);
-                    packet.Write(writer);
-                    byte[] serializedPacketData = memoryStream.ToArray();
-                    await localClient.SendAsync(serializedPacketData, serializedPacketData.Length);
-                }
-            }
-        }
-
-#nullable enable
-        private Packet? GetPacketFromData(byte[] serializedPacketData)
-        {
-            using (MemoryStream memoryStream = new MemoryStream(serializedPacketData))
-            {
-                using (BinaryReader reader = new BinaryReader(memoryStream))
-                {
-                    // Check if the protocol ID is valid and matches
-                    uint receivedProtocolId = reader.ReadUInt32();
-                    if (receivedProtocolId != NetworkManager.PROTOCOL_ID)
-                    {
-                        GD.PrintErr("[ERROR] Invalid protocol ID: " + receivedProtocolId);
-                        return null;
-                    }
-
-                    // Read the packet type
-                    Packet.PacketType packetType = (Packet.PacketType)reader.ReadByte();
-                    // Create the appropriate packet based on the packet type
-                    switch (packetType)
-                    {
-                        case Packet.PacketType.GamePacket:
-                            GamePacket gamePacket = new GamePacket();
-                            gamePacket.Read(reader);
-                            return gamePacket;
-                        case Packet.PacketType.PlayerPacket:
-                            PlayerPacket playerPacket = new PlayerPacket();
-                            playerPacket.Read(reader);
-                            return playerPacket;
-                        default:
-                            GD.PrintErr("[ERROR] Invalid packet type: " + packetType);
-                            return null;
-                    }
-                }
-            }
-        }
-
         private async Task ConnectToServer()
         {
             try
@@ -131,26 +82,27 @@ namespace Game.Networking
                 m_LocalPlayerClient.Connect(m_RelayServerEndpoint);
 
                 // send a message to the server to register the client
-                await SendPacket(m_LocalPlayerClient, joinPacket);
+                await PacketManager.SendPacket(joinPacket, m_LocalPlayerClient);
 
                 // TODO: Add a timeout for the connection attempt
 
-                // receive the client id from the server
+                // receive the packet from the server
                 UdpReceiveResult receiveResult = await m_LocalPlayerClient.ReceiveAsync();
-                Packet? recievedPacket = GetPacketFromData(receiveResult.Buffer);
+                Packet recievedPacket = PacketManager.GetPacketFromData(receiveResult.Buffer); // NOTE: This can return null!
 
-                // TODO: Create a specific AssignClientId() method for this instead of managing the bits directly
-                m_LocalPlayer.SetClientId(recievedPacket?.m_Data[0]); // TODO: this should probably be a guuid or something...
-
-                if (m_LocalPlayer.m_ClientId != null && recievedPacket != null)
-                {
-                    GD.Print("[INFO] Succesfully connected to server, Client ID: " + m_LocalPlayer.m_ClientId);
-                    // TODO: _ = ListenForMessages();
-                }
-                else
+                if (recievedPacket == null || recievedPacket.m_PacketType != Packet.PacketType.GamePacket)
                 {
                     GD.PrintErr("[ERROR] Failed to connect to server");
+                    return;
                 }
+
+                // assign the client id to the player
+                m_LocalPlayer.SetClientId(recievedPacket?.m_Data[0]); // TODO: this should probably be a guuid or something...
+                String serverMessage = recievedPacket.m_Data[1..].ToString();
+                GD.Print("[INFO] Succesfully connected to server, Client ID: " + m_LocalPlayer.m_ClientId);
+                GD.Print(serverMessage);
+
+                // TODO: _ = ListenForMessages();
             }
             catch (SocketException ex)
             {
