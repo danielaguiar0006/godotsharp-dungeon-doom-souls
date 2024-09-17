@@ -82,13 +82,13 @@ namespace Game.Networking
                 m_LocalPlayerClient.Connect(m_RelayServerEndpoint);
 
                 // send a message to the server to register the client
-                await PacketManager.SendPacket(joinPacket, m_LocalPlayerClient);
+                await PacketManager.SendPacket(joinPacket, m_LocalPlayerClient, PROTOCOL_ID);
 
                 // TODO: Add a timeout for the connection attempt
 
                 // receive the packet from the server
                 UdpReceiveResult receiveResult = await m_LocalPlayerClient.ReceiveAsync();
-                Packet recievedPacket = PacketManager.GetPacketFromData(receiveResult.Buffer); // NOTE: This can return null!
+                Packet recievedPacket = PacketManager.GetPacketFromData(receiveResult.Buffer, PROTOCOL_ID); // NOTE: This can return null!
 
                 if (recievedPacket == null || recievedPacket.m_PacketType != Packet.PacketType.GamePacket)
                 {
