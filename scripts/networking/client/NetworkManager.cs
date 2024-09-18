@@ -95,9 +95,12 @@ namespace Game.Networking
                     return;
                 }
 
-                m_LocalPlayer.SetClientId(recievedPacket?.m_Data[0]); // TODO: this should probably be a guuid or something...
-                String serverMessage = System.Text.Encoding.UTF8.GetString(recievedPacket.m_Data[1..]);
+                // Getting the client ID and the server message from the recieved packet
+                ushort recievedClientId = BitConverter.ToUInt16(recievedPacket.m_Data, 0);
+                string serverMessage = System.Text.Encoding.UTF8.GetString(recievedPacket.m_Data[2..]);
 
+                // Setting the client ID and printing the server message
+                m_LocalPlayer.SetClientId(recievedClientId);
                 GD.Print("[INFO] Succesfully connected to server, Client ID: " + m_LocalPlayer.m_ClientId);
                 GD.Print(serverMessage);
 
