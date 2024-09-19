@@ -15,7 +15,7 @@ public partial class GameManager : Node
 
     // initialize a list of mob references
     //public List<Mob> m_ActiveMobs { get; private set; } = new List<Mob>();
-    public List<Player> m_ActivePlayers { get; private set; } = new List<Player>();
+    public Dictionary<string, Player> m_ActivePlayers { get; private set; } = new Dictionary<string, Player>();
     public List<Monster> m_ActiveMonsters { get; private set; } = new List<Monster>();
     public List<NPC> m_ActiveNPCs { get; private set; } = new List<NPC>();
     public List<Boss> m_ActiveBosses { get; private set; } = new List<Boss>();
@@ -76,13 +76,14 @@ public partial class GameManager : Node
         m_localPlayer = (Player)SpawnMob(Mob.MobType.Player, new Vector3(0, 0, 0));
     }
 
-    public Mob SpawnMob(Mob.MobType mobType, Vector3 position)
+    // NOTE: playerId defaults to "0" for the player
+    public Mob SpawnMob(Mob.MobType mobType, Vector3 position, string playerId = "0")
     {
         switch (mobType)
         {
             case Mob.MobType.Player:
                 Player playerInstance = m_PlayerScene.Instantiate<Player>();
-                m_ActivePlayers.Add(playerInstance);
+                m_ActivePlayers.Add(playerId, playerInstance);
                 m_Level.AddChild(playerInstance);
                 playerInstance.Position = position;
                 GD.Print($"Spawning Player at {position}");
@@ -118,7 +119,7 @@ public partial class GameManager : Node
         switch (mob.m_MobType)
         {
             case Mob.MobType.Player:
-                m_ActivePlayers.Remove((Player)mob);
+                GD.PrintErr("[ERROR] Unable to despawn player, use DespawnPlayer() instead");
                 break;
             case Mob.MobType.Monster:
                 m_ActiveMonsters.Remove((Monster)mob);
@@ -133,6 +134,19 @@ public partial class GameManager : Node
 
         // remove the mob from the level/scene
         m_Level.RemoveChild(mob);
+    }
+
+    public void DespawnPlayer(string playerId)
+    {
+        if (m_ActivePlayers.TryGetValue(playerId, out Player player))
+        {
+            m_ActivePlayers.Remove(playerId);
+            m_Level.RemoveChild(player);
+        }
+        else
+        {
+            GD.PrintErr("[ERROR] Unable to despawn player, player not found");
+        }
     }
 
     public override void _ExitTree()

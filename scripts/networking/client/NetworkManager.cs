@@ -49,7 +49,7 @@ namespace Game.Networking
 
             // Getting the local player and its client
             // NOTE: this assumes that the first and only player has been spawned and added to the active player list
-            m_LocalPlayer = GameManager.Instance.m_ActivePlayers[0];
+            m_LocalPlayer = GameManager.Instance.m_ActivePlayers["0"];
             AssignPlayerUdpClient();
             m_LocalPlayerClient = m_LocalPlayer.m_UdpClient;
 
@@ -96,10 +96,25 @@ namespace Game.Networking
                 }
 
                 // Getting the client ID and the server message from the recieved packet
-                string serverMessage = System.Text.Encoding.UTF8.GetString(recievedPacket.m_Data);
+                string playerId;
+                string serverMessage;
+                using (MemoryStream ms = new MemoryStream(recievedPacket.m_Data))
+                {
+                    using (BinaryReader br = new BinaryReader(ms))
+                    {
+                        int totalDataLength = recievedPacket.m_Data.Length;
+                        int playerIdLength = br.ReadInt32();
+                        playerId = System.Text.Encoding.UTF8.GetString(br.ReadBytes(playerIdLength));
+                        serverMessage = System.Text.Encoding.UTF8.GetString(br.ReadBytes(totalDataLength - playerIdLength - 1));
+                    }
+                }
+
+                // Add the player to the active players dictionary
+                GameManager.Instance.m_ActivePlayers.Clear(); // Can be cleared because it's assumed that the first and only player is the local player
+                GameManager.Instance.m_ActivePlayers.Add(playerId, m_LocalPlayer);
 
                 // Setting the client ID and printing the server message
-                GD.Print("[INFO] Succesfully connected to server");
+                GD.Print("[INFO] Succesfully connected to server, player ID: " + playerId);
                 GD.Print(serverMessage);
 
                 // TODO: _ = ListenForMessages();
