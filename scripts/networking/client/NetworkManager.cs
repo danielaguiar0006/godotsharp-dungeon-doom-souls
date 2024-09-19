@@ -96,12 +96,10 @@ namespace Game.Networking
                 }
 
                 // Getting the client ID and the server message from the recieved packet
-                ushort recievedClientId = BitConverter.ToUInt16(recievedPacket.m_Data, 0);
-                string serverMessage = System.Text.Encoding.UTF8.GetString(recievedPacket.m_Data[2..]);
+                string serverMessage = System.Text.Encoding.UTF8.GetString(recievedPacket.m_Data);
 
                 // Setting the client ID and printing the server message
-                m_LocalPlayer.SetClientId(recievedClientId);
-                GD.Print("[INFO] Succesfully connected to server, Client ID: " + m_LocalPlayer.m_ClientId);
+                GD.Print("[INFO] Succesfully connected to server");
                 GD.Print(serverMessage);
 
                 // TODO: _ = ListenForMessages();
@@ -115,6 +113,25 @@ namespace Game.Networking
                 GD.PrintErr("[ERROR] An unexpected error occurred: " + ex.Message);
             }
         }
+
+        public void DisconnectFromServer()
+        {
+            if (m_LocalPlayerClient != null)
+            {
+                // Creating a new disconnect packet
+                GamePacket disconnectPacket = new GamePacket(GamePacket.OpCode.PlayerLeave);
+                disconnectPacket.m_Data = new byte[] { (byte)0 };
+
+                // send a message to the server to register the client
+                _ = PacketManager.SendPacket(disconnectPacket, m_LocalPlayerClient, PROTOCOL_ID);
+
+                m_LocalPlayerClient.Close();
+                m_LocalPlayerClient.Dispose();
+            }
+
+            GD.PrintErr("m_LocalPlayerClient is null or m_LocalPlayer.m_ClientId is null");
+        }
+
 
         private void AssignPlayerUdpClient()
         {

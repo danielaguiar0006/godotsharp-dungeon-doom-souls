@@ -21,6 +21,7 @@ public partial class GameManager : Node
     public List<Boss> m_ActiveBosses { get; private set; } = new List<Boss>();
 
     private PackedScene m_PlayerScene;
+    private Player m_localPlayer;
 
     private static GameManager _instance;
 
@@ -52,17 +53,16 @@ public partial class GameManager : Node
 
         // NOTE: Must load resources before calling StartGame()
         m_PlayerScene = ResourceLoader.Load<PackedScene>("res://scenes/prefabs/player.tscn");
-        SpawnMob(Mob.MobType.Player, new Vector3(0, 0, 0));
+
+        if (m_CurrentLevel == 0)
+        {
+            StartGame();
+        }
 
         if (m_IsOnline)
         {
             PackedScene networkManagerScene = ResourceLoader.Load<PackedScene>("res://scenes/network_manager.tscn");
             AddChild(networkManagerScene.Instantiate<NetworkManager>());
-        }
-
-        if (m_CurrentLevel == 0)
-        {
-            StartGame();
         }
     }
 
@@ -73,9 +73,10 @@ public partial class GameManager : Node
 
     public void StartGame()
     {
+        m_localPlayer = (Player)SpawnMob(Mob.MobType.Player, new Vector3(0, 0, 0));
     }
 
-    public void SpawnMob(Mob.MobType mobType, Vector3 position)
+    public Mob SpawnMob(Mob.MobType mobType, Vector3 position)
     {
         switch (mobType)
         {
@@ -84,20 +85,25 @@ public partial class GameManager : Node
                 m_ActivePlayers.Add(playerInstance);
                 m_Level.AddChild(playerInstance);
                 playerInstance.Position = position;
-                GD.Print("Spawning Player");
-                break;
-            case Mob.MobType.Monster:
-                // TODO: spawn a monster
-                GD.Print("Spawning Monster");
-                break;
-            case Mob.MobType.NPC:
-                // TODO: spawn a NPC
-                GD.Print("Spawning NPC");
-                break;
-            case Mob.MobType.Boss:
-                // TODO: spawn a Boss
-                GD.Print("Spawning Boss");
-                break;
+                GD.Print($"Spawning Player at {position}");
+                return playerInstance;
+            default:
+                GD.PrintErr("Invalid mob type");
+                return null;
+
+                // TODO: implement spawn logic for other mob types
+                // case Mob.MobType.Monster:
+                //     // TODO: spawn a monster
+                //     GD.Print("Spawning Monster");
+                //     break;
+                // case Mob.MobType.NPC:
+                //     // TODO: spawn a NPC
+                //     GD.Print("Spawning NPC");
+                //     break;
+                // case Mob.MobType.Boss:
+                //     // TODO: spawn a Boss
+                //     GD.Print("Spawning Boss");
+                //     break;
         }
     }
 
@@ -127,5 +133,11 @@ public partial class GameManager : Node
 
         // remove the mob from the level/scene
         m_Level.RemoveChild(mob);
+    }
+
+    public override void _ExitTree()
+    {
+        GD.Print("GameManager exiting");
+        NetworkManager.Instance.DisconnectFromServer();
     }
 }

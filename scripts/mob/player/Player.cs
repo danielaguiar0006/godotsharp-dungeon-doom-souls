@@ -24,7 +24,6 @@ public partial class Player : Mob
 
 #nullable enable
     public UdpClient? m_UdpClient;
-    public ushort? m_ClientId { get; private set; }
 
     // Aiming/Camera input
     private float m_YawInput = 0.0f;
@@ -150,11 +149,5 @@ public partial class Player : Mob
         Vector3 cameraRotation = m_CameraPivot.Rotation;
         cameraRotation.X = Mathf.Clamp(cameraRotation.X, m_PitchLowerLimit, m_PitchUpperLimit);
         m_CameraPivot.Rotation = cameraRotation;
-    }
-
-    public void SetClientId(ushort? clientId)
-    {
-        if (clientId == null) { m_ClientId = null; }
-        else { m_ClientId = clientId; }
     }
 }
