@@ -131,7 +131,7 @@ namespace Game.Networking
                 GD.Print("[INFO] Succesfully connected to server, player ID: " + playerId);
                 GD.Print(serverMessage);
 
-                // TODO: _ = ListenForMessages();
+                _ = ListenForMessages();
             }
             catch (SocketException ex)
             {
@@ -140,6 +140,38 @@ namespace Game.Networking
             catch (Exception ex)
             {
                 GD.PrintErr("[ERROR] An unexpected error occurred: " + ex.Message);
+            }
+        }
+
+        public async Task ListenForMessages()
+        {
+            while (m_LocalPlayerClient != null)
+            {
+                try
+                {
+                    UdpReceiveResult receiveResult = await m_LocalPlayerClient.ReceiveAsync();
+                    Packet receivedPacket = PacketManager.GetPacketFromData(receiveResult.Buffer, PROTOCOL_ID); // NOTE: This can return null!
+                    if (receivedPacket == null)
+                    {  // NOTE: A wrong protocol ID will cause this to fail
+                        Console.WriteLine($"[ERROR]: Failed to get packet from data: {receiveResult.Buffer}");
+                        continue;
+                    }
+
+                    Console.WriteLine($"[DEBUG]: Received packet: {receivedPacket.m_PacketType.ToString()}");
+                    Console.WriteLine($"[DEBUG]: Received packet data: {receivedPacket.m_Data.Length} bytes");
+
+                    // TODO: Handle the received packet
+                }
+                catch (SocketException e)
+                {
+                    Console.WriteLine($"[ERROR]: Failed to receive message: {e.Message}");
+                    await Task.Delay(100); // Add a small delay to prevent tight loop on error
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"[ERROR]: Failed to receive message: {e.Message}");
+                    await Task.Delay(100); // Add a small delay to prevent tight loop on error
+                }
             }
         }
 
