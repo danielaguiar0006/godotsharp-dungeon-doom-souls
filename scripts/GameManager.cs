@@ -1,6 +1,7 @@
 using Godot;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using Game.Networking;
 
 
@@ -61,6 +62,7 @@ public partial class GameManager : Node
 
         if (m_IsOnline)
         {
+            m_localPlayer.m_UdpClient = new UdpClient();
             PackedScene networkManagerScene = ResourceLoader.Load<PackedScene>("res://scenes/network_manager.tscn");
             AddChild(networkManagerScene.Instantiate<NetworkManager>());
         }

@@ -16,6 +16,7 @@ namespace Game.Networking
         private IPEndPoint m_RelayServerEndpoint;
         private Player m_LocalPlayer;
         private UdpClient m_LocalPlayerClient;
+        private String m_LocalPlayerId;
 
         private static NetworkManager _instance;
 
@@ -49,8 +50,12 @@ namespace Game.Networking
 
             // Getting the local player and its client
             // NOTE: this assumes that the first and only player has been spawned and added to the active player list
+            if (!GameManager.Instance.m_ActivePlayers.ContainsKey("0"))
+            {
+                GD.PrintErr("No local player found in active players list");
+                return;
+            }
             m_LocalPlayer = GameManager.Instance.m_ActivePlayers["0"];
-            AssignPlayerUdpClient();
             m_LocalPlayerClient = m_LocalPlayer.m_UdpClient;
 
             // TODO: check for server online if so connect to it, else try and start a server
@@ -98,20 +103,29 @@ namespace Game.Networking
                 // Getting the client ID and the server message from the recieved packet
                 string playerId;
                 string serverMessage;
-                using (MemoryStream ms = new MemoryStream(recievedPacket.m_Data))
+                try
                 {
-                    using (BinaryReader br = new BinaryReader(ms))
+                    using (MemoryStream ms = new MemoryStream(recievedPacket.m_Data))
                     {
-                        int totalDataLength = recievedPacket.m_Data.Length;
-                        int playerIdLength = br.ReadInt32();
-                        playerId = System.Text.Encoding.UTF8.GetString(br.ReadBytes(playerIdLength));
-                        serverMessage = System.Text.Encoding.UTF8.GetString(br.ReadBytes(totalDataLength - playerIdLength - 1));
+                        using (BinaryReader br = new BinaryReader(ms))
+                        {
+                            int totalDataLength = recievedPacket.m_Data.Length;
+                            int playerIdLength = br.ReadInt32();
+                            playerId = System.Text.Encoding.UTF8.GetString(br.ReadBytes(playerIdLength));
+                            serverMessage = System.Text.Encoding.UTF8.GetString(br.ReadBytes(totalDataLength - playerIdLength - 1));
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    GD.PrintErr("[ERROR] Failed to parse recieved packet data: " + ex.Message);
+                    return;
                 }
 
                 // Add the player to the active players dictionary
                 GameManager.Instance.m_ActivePlayers.Clear(); // Can be cleared because it's assumed that the first and only player is the local player
                 GameManager.Instance.m_ActivePlayers.Add(playerId, m_LocalPlayer);
+                m_LocalPlayerId = playerId;
 
                 // Setting the client ID and printing the server message
                 GD.Print("[INFO] Succesfully connected to server, player ID: " + playerId);
@@ -131,26 +145,27 @@ namespace Game.Networking
 
         public void DisconnectFromServer()
         {
-            if (m_LocalPlayerClient != null)
+            if (m_LocalPlayerClient == null)
             {
-                // Creating a new disconnect packet
-                GamePacket disconnectPacket = new GamePacket(GamePacket.OpCode.PlayerLeave);
-                disconnectPacket.m_Data = new byte[] { (byte)0 };
-
-                // send a message to the server to register the client
-                _ = PacketManager.SendPacket(disconnectPacket, m_LocalPlayerClient, PROTOCOL_ID);
-
-                m_LocalPlayerClient.Close();
-                m_LocalPlayerClient.Dispose();
+                GD.PrintErr("m_LocalPlayerClient is null");
+                return;
+            }
+            if (m_LocalPlayerId == null)
+            {
+                GD.PrintErr("m_LocalPlayerId is null");
+                return;
             }
 
-            GD.PrintErr("m_LocalPlayerClient is null or m_LocalPlayer.m_ClientId is null");
-        }
+            // Creating a new disconnect packet
+            GamePacket disconnectPacket = new GamePacket(GamePacket.OpCode.PlayerLeave);
+            disconnectPacket.m_Data = new byte[] { (byte)0 };
 
+            // send a message to the server to register the client
+            _ = PacketManager.SendPacket(disconnectPacket, m_LocalPlayerClient, PROTOCOL_ID);
 
-        private void AssignPlayerUdpClient()
-        {
-            m_LocalPlayer.m_UdpClient = new UdpClient();
+            m_LocalPlayerClient.Close();
+            m_LocalPlayerClient.Dispose();
+            m_LocalPlayerClient = null;
         }
 
         // public static void ServerUpdate(double delta)
